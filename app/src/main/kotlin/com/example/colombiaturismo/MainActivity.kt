@@ -20,13 +20,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.cartagena.CartagenaListScreen
 
 private val Navy = Color(0xFF24455F)
 private val NavyText = Color(0xFF1F3F5C)
 private val Coral = Color(0xFFE8604C)
 private val Muted = Color(0xFF7A8FA3)
 private val Page = Color(0xFFF4F6F8)
-private val Border = Color(0xFFE1E8EE)
 
 data class Place(
     val name: String,
@@ -61,9 +61,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                ColombiaTurismoApp()
-            }
+            ColombiaTurismoApp()
         }
     }
 }
@@ -80,8 +78,10 @@ fun ColombiaTurismoApp() {
                 savedCount = savedCount,
                 onSave = { savedCount++ }
             )
+            "cartagena" -> CartagenaListScreen()
             else -> HomeScreen(
                 onIbagueClick = { screen = "ibague" },
+                onCartagenaClick = { screen = "cartagena" },
                 savedCount = savedCount
             )
         }
@@ -148,7 +148,7 @@ fun SearchBar() {
 }
 
 @Composable
-fun HomeScreen(onIbagueClick: () -> Unit, savedCount: Int) {
+fun HomeScreen(onIbagueClick: () -> Unit, onCartagenaClick: () -> Unit, savedCount: Int) {
     Column(Modifier.fillMaxSize()) {
         AppHeader("Colombia Turismo", "Descubre la magia de nuestro país")
         Column(Modifier.fillMaxSize()) {
@@ -165,7 +165,7 @@ fun HomeScreen(onIbagueClick: () -> Unit, savedCount: Int) {
             }
 
             Row(Modifier.fillMaxSize()) {
-                CityRail(onIbagueClick)
+                CityRail(onIbagueClick, onCartagenaClick)
                 HomeFeatured(
                     modifier = Modifier.weight(1f)
                 )
@@ -187,28 +187,25 @@ fun FilterChip(text: String, selected: Boolean) {
 }
 
 @Composable
-fun CityRail(onIbagueClick: () -> Unit) {
+fun CityRail(onIbagueClick: () -> Unit, onCartagenaClick: () -> Unit) {
     Column(
         modifier = Modifier
             .width(108.dp)
             .fillMaxHeight()
             .padding(start = 10.dp, end = 8.dp, bottom = 14.dp)
     ) {
-        cities.take(3).forEach { city ->
-            CityMiniCard(city, Modifier.clickable(enabled = city.name == "Ibagué") {
-                if (city.name == "Ibagué") onIbagueClick()
-            })
+        cities.forEach { city ->
+            CityMiniCard(
+                city = city,
+                modifier = Modifier.clickable {
+                    when (city.name) {
+                        "Ibagué" -> onIbagueClick()
+                        "Cartagena" -> onCartagenaClick()
+                    }
+                }
+            )
             Spacer(Modifier.height(6.dp))
         }
-        Text(
-            "Ibagué",
-            color = Coral,
-            fontSize = 11.sp,
-            modifier = Modifier
-                .padding(8.dp)
-                .clickable { onIbagueClick() }
-        )
-        Text("Ver todas", color = Coral, fontSize = 11.sp, modifier = Modifier.padding(8.dp))
     }
 }
 
@@ -288,15 +285,6 @@ fun HomeFeatured(
             "Arte ancestral de Colombia.",
             "4.8 · Historia",
             Color(0xFFFAC775)
-        )
-
-        Text(
-            "Ver los 8 lugares de Bogotá",
-            color = Coral,
-            fontSize = 11.sp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 2.dp)
         )
     }
 }
