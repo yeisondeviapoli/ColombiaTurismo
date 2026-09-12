@@ -8,8 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,13 +23,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.cartagena.CartagenaDetailScreen
+import com.example.colombiaturismo.cartagena.CartagenaListScreen
+import com.example.colombiaturismo.cartagena.CartagenaPlace
 
 private val Navy = Color(0xFF24455F)
 private val NavyText = Color(0xFF1F3F5C)
 private val Coral = Color(0xFFE8604C)
 private val Muted = Color(0xFF7A8FA3)
 private val Page = Color(0xFFF4F6F8)
-private val Border = Color(0xFFE1E8EE)
 
 data class Place(
     val name: String,
@@ -61,9 +66,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme {
-                ColombiaTurismoApp()
-            }
+            ColombiaTurismoApp()
         }
     }
 }
@@ -71,18 +74,30 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun ColombiaTurismoApp() {
     var screen by remember { mutableStateOf("home") }
+    var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Page) {
         when (screen) {
             "ibague" -> CityScreen(
                 onBack = { screen = "home" },
-                savedCount = savedCount,
                 onSave = { savedCount++ }
             )
+            "cartagena_detail" -> {
+                val place = selectedCartagenaPlace
+                if (place != null) {
+                    CartagenaDetailScreen(
+                        place = place,
+                        onBack = { screen = "home" }
+                    )
+                }
+            }
             else -> HomeScreen(
                 onIbagueClick = { screen = "ibague" },
-                savedCount = savedCount
+                onNavigateToDetail = { place ->
+                    selectedCartagenaPlace = place
+                    screen = "cartagena_detail"
+                }
             )
         }
     }
@@ -106,7 +121,7 @@ fun AppHeader(
         ) {
             if (onBack != null) {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Outlined.ArrowBack, "Volver", tint = Color.White)
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
             } else {
                 Box(
@@ -136,6 +151,7 @@ fun SearchBar() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(50))
             .background(Color.White)
             .padding(horizontal = 15.dp, vertical = 10.dp),
@@ -148,27 +164,81 @@ fun SearchBar() {
 }
 
 @Composable
-fun HomeScreen(onIbagueClick: () -> Unit, savedCount: Int) {
+fun HomeScreen(
+    onIbagueClick: () -> Unit,
+    onNavigateToDetail: (CartagenaPlace) -> Unit
+) {
+    var selectedCity by remember { mutableStateOf("Bogotá") }
+
     Column(Modifier.fillMaxSize()) {
-        AppHeader("Colombia Turismo", "Descubre la magia de nuestro país")
+        AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?")
+
         Column(Modifier.fillMaxSize()) {
             Spacer(Modifier.height(13.dp))
             SearchBar()
+
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp),
                 horizontalArrangement = Arrangement.spacedBy(7.dp)
             ) {
-                FilterChip("Todos", true)
-                FilterChip("Cultura", false)
-                FilterChip("Playas", false)
-                FilterChip("Naturaleza", false)
+                FilterChip(text = "Todos", selected = true)
+                FilterChip(text = "Cultura", selected = false)
+                FilterChip(text = "Playas", selected = false)
+                FilterChip(text = "Naturaleza", selected = false)
             }
 
             Row(Modifier.fillMaxSize()) {
-                CityRail(onIbagueClick)
-                HomeFeatured(
-                    modifier = Modifier.weight(1f)
+                // Columna 1: Menú lateral de ciudades
+                CityRail(
+                    selectedCity = selectedCity,
+                    onCitySelect = { city ->
+                        if (city == "Ibagué") {
+                            onIbagueClick()
+                        } else {
+                            selectedCity = city
+                        }
+                    }
                 )
+
+                // CORRECCIÓN 1: Renderizado dinámico según la ciudad seleccionada
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                ) {
+                    when (selectedCity) {
+                        "Cartagena" -> {
+                            CartagenaListScreen(
+                                onPlaceClick = { place ->
+                                    onNavigateToDetail(place)
+                                }
+                            )
+                        }
+                        "Medellín" -> {
+                            HomeFeatured(
+                                cityName = "Medellín",
+                                subtitle = "Innovación y vida",
+                                places = listOf(
+                                    Place("Parque Arví", "Naturaleza y cables turísticos.", "Naturaleza", "4.8", Color(0xFFC0DD97)),
+                                    Place("Comuna 13", "Arte urbano y transformación.", "Cultura", "4.9", Color(0xFFF4C77B))
+                                ),
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        else -> {
+                            // Bogotá por defecto
+                            HomeFeatured(
+                                cityName = "Bogotá",
+                                subtitle = "Cultura y tradición",
+                                places = listOf(
+                                    Place("Cerro de Monserrate", "Vista increíble de la ciudad.", "Naturaleza", "4.9", Color(0xFFB5D4F4)),
+                                    Place("Museo del Oro", "Arte ancestral de Colombia.", "Historia", "4.8", Color(0xFFFAC775))
+                                ),
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -187,36 +257,42 @@ fun FilterChip(text: String, selected: Boolean) {
 }
 
 @Composable
-fun CityRail(onIbagueClick: () -> Unit) {
+fun CityRail(
+    selectedCity: String,
+    onCitySelect: (String) -> Unit
+) {
     Column(
         modifier = Modifier
             .width(108.dp)
             .fillMaxHeight()
             .padding(start = 10.dp, end = 8.dp, bottom = 14.dp)
     ) {
-        cities.take(3).forEach { city ->
-            CityMiniCard(city, Modifier.clickable(enabled = city.name == "Ibagué") {
-                if (city.name == "Ibagué") onIbagueClick()
-            })
+        cities.forEach { city ->
+            val isSelected = city.name == selectedCity
+
+            CityMiniCard(
+                city = city,
+                isSelected = isSelected,
+                modifier = Modifier.clickable {
+                    onCitySelect(city.name)
+                }
+            )
             Spacer(Modifier.height(6.dp))
         }
-        Text(
-            "Ibagué",
-            color = Coral,
-            fontSize = 11.sp,
-            modifier = Modifier
-                .padding(8.dp)
-                .clickable { onIbagueClick() }
-        )
-        Text("Ver todas", color = Coral, fontSize = 11.sp, modifier = Modifier.padding(8.dp))
     }
 }
 
 @Composable
-fun CityMiniCard(city: City, modifier: Modifier = Modifier) {
+fun CityMiniCard(
+    city: City,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (isSelected) Color(0xFFE2E8F0) else Color.Transparent)
             .padding(8.dp)
     ) {
         Box(
@@ -228,13 +304,22 @@ fun CityMiniCard(city: City, modifier: Modifier = Modifier) {
             contentAlignment = Alignment.Center
         ) { city.icon() }
         Spacer(Modifier.height(7.dp))
-        Text(city.name, color = NavyText, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Text(
+            text = city.name,
+            color = NavyText,
+            fontSize = 12.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+        )
         Text(city.subtitle, color = Color(0xFF6B8298), fontSize = 10.5.sp, lineHeight = 14.sp)
     }
 }
 
+// CORRECCIÓN 2: HomeFeatured ahora acepta datos dinámicos y scroll vertical
 @Composable
 fun HomeFeatured(
+    cityName: String,
+    subtitle: String,
+    places: List<Place>,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -244,18 +329,19 @@ fun HomeFeatured(
                 Color.White,
                 RoundedCornerShape(topStart = 18.dp)
             )
+            .verticalScroll(rememberScrollState()) // Añadido scroll para evitar recortes
             .padding(14.dp)
     ) {
         Row(verticalAlignment = Alignment.Bottom) {
             Column(Modifier.weight(1f)) {
                 Text(
-                    "Bogotá",
+                    cityName,
                     color = NavyText,
                     fontSize = 19.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    "Cultura y tradición",
+                    subtitle,
                     color = Muted,
                     fontSize = 11.sp
                 )
@@ -276,28 +362,14 @@ fun HomeFeatured(
             modifier = Modifier.padding(top = 15.dp, bottom = 9.dp)
         )
 
-        FeaturedCard(
-            "Cerro de Monserrate",
-            "Vista increíble de la ciudad.",
-            "4.9 · Naturaleza",
-            Color(0xFFB5D4F4)
-        )
-
-        FeaturedCard(
-            "Museo del Oro",
-            "Arte ancestral de Colombia.",
-            "4.8 · Historia",
-            Color(0xFFFAC775)
-        )
-
-        Text(
-            "Ver los 8 lugares de Bogotá",
-            color = Coral,
-            fontSize = 11.sp,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 2.dp)
-        )
+        places.forEach { place ->
+            FeaturedCard(
+                name = place.name,
+                description = place.description,
+                rating = "${place.rating} · ${place.category}",
+                color = place.imageColor
+            )
+        }
     }
 }
 
@@ -329,7 +401,7 @@ fun FeaturedCard(name: String, description: String, rating: String, color: Color
 }
 
 @Composable
-fun CityScreen(onBack: () -> Unit, savedCount: Int, onSave: () -> Unit) {
+fun CityScreen(onBack: () -> Unit, onSave: () -> Unit) {
     Column(Modifier.fillMaxSize()) {
         AppHeader("Ibagué", "Música y naturaleza", onBack)
         LazyColumn(
