@@ -302,7 +302,19 @@ fun CityMiniCard(
                 .clip(RoundedCornerShape(9.dp))
                 .background(city.imageColor),
             contentAlignment = Alignment.Center
-        ) { city.icon() }
+        ) {
+            // Cartagena
+            if (city.name == "Cartagena") {
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ciudad_amurallada),
+                    contentDescription = city.name,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                city.icon()
+            }
+        }
         Spacer(Modifier.height(7.dp))
         Text(
             text = city.name,
