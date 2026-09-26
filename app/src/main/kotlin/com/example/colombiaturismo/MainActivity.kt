@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -69,6 +70,7 @@ private val ibaguePlaces = listOf(
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             ColombiaTurismoApp()
         }
@@ -87,6 +89,12 @@ fun ColombiaTurismoApp() {
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Page) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding(),
+        color = Page
+    ) {
         when (screen) {
             "ibague" -> CityScreen(
                 onBack = { screen = "home" },
