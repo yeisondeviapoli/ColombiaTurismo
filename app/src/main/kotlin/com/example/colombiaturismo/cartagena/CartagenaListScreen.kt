@@ -1,5 +1,6 @@
 package com.example.colombiaturismo.cartagena
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,13 +11,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.Museum
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,27 +56,27 @@ fun CartagenaCard(
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
+            // Contenedor de la imagen con el botón de guardar superpuesto
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(110.dp)
+                    .height(140.dp) // Ajustado ligeramente para lucir mejor con fotos
                     .clip(RoundedCornerShape(12.dp))
-                    .background(Color(0xFFE8ECEF))
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Museum,
-                    contentDescription = null,
-                    tint = MutedText,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .align(Alignment.Center)
+                // Imagen real cargada desde drawable
+                Image(
+                    painter = painterResource(id = place.imageRes),
+                    contentDescription = place.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
 
+                // Botón de favoritos / marcador encima de la imagen
                 IconButton(
                     onClick = { /* Guardar */ },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(4.dp)
+                        .padding(8.dp)
                         .size(32.dp)
                         .background(Color.White.copy(alpha = 0.8f), shape = RoundedCornerShape(20.dp))
                 ) {
