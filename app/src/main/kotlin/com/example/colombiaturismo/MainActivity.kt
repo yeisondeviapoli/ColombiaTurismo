@@ -2,6 +2,7 @@ package com.example.colombiaturismo
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -80,6 +81,10 @@ fun ColombiaTurismoApp() {
     var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
     var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
+
+    BackHandler(enabled = screen != "home") {
+        screen = "home"
+    }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Page) {
         when (screen) {
