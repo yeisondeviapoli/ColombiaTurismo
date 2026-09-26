@@ -23,6 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.bogota.BogotaDetailScreen
+import com.example.colombiaturismo.bogota.BogotaListScreen
+import com.example.colombiaturismo.bogota.BogotaPlace
 import com.example.colombiaturismo.cartagena.CartagenaDetailScreen
 import com.example.colombiaturismo.cartagena.CartagenaListScreen
 import com.example.colombiaturismo.cartagena.CartagenaPlace
@@ -75,6 +78,7 @@ class MainActivity : ComponentActivity() {
 fun ColombiaTurismoApp() {
     var screen by remember { mutableStateOf("home") }
     var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
+    var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Page) {
@@ -92,11 +96,24 @@ fun ColombiaTurismoApp() {
                     )
                 }
             }
+            "bogota_detail" -> {
+                val place = selectedBogotaPlace
+                if (place != null) {
+                    BogotaDetailScreen(
+                        place = place,
+                        onBack = { screen = "home" }
+                    )
+                }
+            }
             else -> HomeScreen(
                 onIbagueClick = { screen = "ibague" },
                 onNavigateToDetail = { place ->
                     selectedCartagenaPlace = place
                     screen = "cartagena_detail"
+                },
+                onNavigateToBogotaDetail = { place ->
+                    selectedBogotaPlace = place
+                    screen = "bogota_detail"
                 }
             )
         }
@@ -113,6 +130,7 @@ fun AppHeader(
         modifier = Modifier
             .fillMaxWidth()
             .background(Navy)
+            .statusBarsPadding()
             .padding(start = 16.dp, end = 16.dp, bottom = 18.dp)
     ) {
         Row(
@@ -166,7 +184,8 @@ fun SearchBar() {
 @Composable
 fun HomeScreen(
     onIbagueClick: () -> Unit,
-    onNavigateToDetail: (CartagenaPlace) -> Unit
+    onNavigateToDetail: (CartagenaPlace) -> Unit,
+    onNavigateToBogotaDetail: (BogotaPlace) -> Unit
 ) {
     var selectedCity by remember { mutableStateOf("Bogotá") }
 
@@ -227,14 +246,10 @@ fun HomeScreen(
                         }
                         else -> {
                             // Bogotá por defecto
-                            HomeFeatured(
-                                cityName = "Bogotá",
-                                subtitle = "Cultura y tradición",
-                                places = listOf(
-                                    Place("Cerro de Monserrate", "Vista increíble de la ciudad.", "Naturaleza", "4.9", Color(0xFFB5D4F4)),
-                                    Place("Museo del Oro", "Arte ancestral de Colombia.", "Historia", "4.8", Color(0xFFFAC775))
-                                ),
-                                modifier = Modifier.fillMaxSize()
+                            BogotaListScreen(
+                                onPlaceClick = { place ->
+                                    onNavigateToBogotaDetail(place)
+                                }
                             )
                         }
                     }
@@ -307,6 +322,13 @@ fun CityMiniCard(
             if (city.name == "Cartagena") {
                 androidx.compose.foundation.Image(
                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.ciudad_amurallada),
+                    contentDescription = city.name,
+                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else if (city.name == "Bogotá") {
+                androidx.compose.foundation.Image(
+                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.bogota_ciudad),
                     contentDescription = city.name,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
