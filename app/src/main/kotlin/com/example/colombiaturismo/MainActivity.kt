@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +34,9 @@ import com.example.colombiaturismo.bogota.BogotaPlace
 import com.example.colombiaturismo.cartagena.CartagenaDetailScreen
 import com.example.colombiaturismo.cartagena.CartagenaListScreen
 import com.example.colombiaturismo.cartagena.CartagenaPlace
+import com.example.colombiaturismo.ibague.IbagueDetailScreen
+import com.example.colombiaturismo.ibague.IbagueListScreen
+import com.example.colombiaturismo.ibague.IbaguePlace
 
 private val Navy = Color(0xFF24455F)
 private val NavyText = Color(0xFF1F3F5C)
@@ -82,13 +88,13 @@ fun ColombiaTurismoApp() {
     var screen by remember { mutableStateOf("home") }
     var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
     var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
+    var selectedIbaguePlace by remember { mutableStateOf<IbaguePlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
 
     BackHandler(enabled = screen != "home") {
         screen = "home"
     }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = Page) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -96,10 +102,9 @@ fun ColombiaTurismoApp() {
         color = Page
     ) {
         when (screen) {
-            "ibague" -> CityScreen(
-                onBack = { screen = "home" },
-                onSave = { savedCount++ }
-            )
+            "ibague_detail" -> selectedIbaguePlace?.let { place ->
+                IbagueDetailScreen(place = place, onBack = { screen = "home" })
+            }
             "cartagena_detail" -> {
                 val place = selectedCartagenaPlace
                 if (place != null) {
@@ -119,7 +124,10 @@ fun ColombiaTurismoApp() {
                 }
             }
             else -> HomeScreen(
-                onIbagueClick = { screen = "ibague" },
+                onNavigateToIbagueDetail = { place ->
+                    selectedIbaguePlace = place
+                    screen = "ibague_detail"
+                },
                 onNavigateToDetail = { place ->
                     selectedCartagenaPlace = place
                     screen = "cartagena_detail"
@@ -196,7 +204,7 @@ fun SearchBar() {
 
 @Composable
 fun HomeScreen(
-    onIbagueClick: () -> Unit,
+    onNavigateToIbagueDetail: (IbaguePlace) -> Unit,
     onNavigateToDetail: (CartagenaPlace) -> Unit,
     onNavigateToBogotaDetail: (BogotaPlace) -> Unit
 ) {
@@ -224,11 +232,7 @@ fun HomeScreen(
                 CityRail(
                     selectedCity = selectedCity,
                     onCitySelect = { city ->
-                        if (city == "Ibagué") {
-                            onIbagueClick()
-                        } else {
-                            selectedCity = city
-                        }
+                        selectedCity = city
                     }
                 )
 
@@ -244,6 +248,11 @@ fun HomeScreen(
                                 onPlaceClick = { place ->
                                     onNavigateToDetail(place)
                                 }
+                            )
+                        }
+                        "Ibagué" -> {
+                            IbagueListScreen(
+                                onPlaceClick = onNavigateToIbagueDetail
                             )
                         }
                         "Medellín" -> {
@@ -342,6 +351,13 @@ fun CityMiniCard(
             } else if (city.name == "Bogotá") {
                 androidx.compose.foundation.Image(
                     painter = androidx.compose.ui.res.painterResource(id = R.drawable.bogota_ciudad),
+                    contentDescription = city.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else if (city.name == "Ibagué") {
+                Image(
+                    painter = painterResource(id = R.drawable.combeima),
                     contentDescription = city.name,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
