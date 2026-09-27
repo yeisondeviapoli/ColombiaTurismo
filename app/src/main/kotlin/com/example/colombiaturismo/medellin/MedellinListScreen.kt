@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -64,6 +65,12 @@ fun MedellinListScreen(query: String = "", category: String = "Todos", onPlaceCl
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
+                        IconButton(
+                            onClick = { },
+                            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(32.dp).background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(20.dp))
+                        ) {
+                            Icon(Icons.Outlined.BookmarkBorder, "Guardar", tint = DarkText, modifier = Modifier.size(18.dp))
+                        }
                     }
                     Spacer(Modifier.height(8.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
