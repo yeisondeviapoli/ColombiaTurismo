@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
-import kotlinx.coroutines.launch
 import com.example.colombiaturismo.bogota.BogotaDetailScreen
 import com.example.colombiaturismo.bogota.BogotaListScreen
 import com.example.colombiaturismo.bogota.BogotaPlace
@@ -160,8 +159,7 @@ fun ColombiaTurismoApp() {
 fun AppHeader(
     title: String,
     subtitle: String,
-    onBack: (() -> Unit)? = null,
-    onMenuClick: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -179,11 +177,6 @@ fun AppHeader(
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
             } else {
-                if (onMenuClick != null) {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Outlined.Menu, "Abrir ciudades", tint = Color.White)
-                    }
-                }
                 Box(
                     modifier = Modifier
                         .size(42.dp)
@@ -244,31 +237,28 @@ fun HomeScreen(
     var selectedCity by remember { mutableStateOf("Bogotá") }
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Todos") }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
 
-    ModalNavigationDrawer(
-        drawerState = drawerState,
-        drawerContent = {
-            ModalDrawerSheet {
-                Text("Ciudades", modifier = Modifier.padding(24.dp), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NavyText)
-                CityRail(selectedCity = selectedCity, onCitySelect = { city ->
-                    selectedCity = city
-                    scope.launch { drawerState.close() }
-                })
+    Column(Modifier.fillMaxSize()) {
+        AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?")
+        Spacer(Modifier.height(13.dp))
+        SearchBar(query = query, onQueryChange = { query = it })
+        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+            listOf("Todos", "Cultura", "Naturaleza", "Historia", "Playas").forEach { option ->
+                FilterChip(text = option, selected = category == option, onClick = { category = option })
             }
         }
-    ) {
-        Column(Modifier.fillMaxSize()) {
-            AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?", onMenuClick = { scope.launch { drawerState.open() } })
-            Spacer(Modifier.height(13.dp))
-            SearchBar(query = query, onQueryChange = { query = it })
-            Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-                listOf("Todos", "Cultura", "Naturaleza", "Historia", "Playas").forEach { option ->
-                    FilterChip(text = option, selected = category == option, onClick = { category = option })
+        Row(Modifier.fillMaxSize()) {
+            CityRail(
+                selectedCity = selectedCity,
+                onCitySelect = { city ->
+                    selectedCity = city
                 }
-            }
-            Box(Modifier.fillMaxSize()) {
+            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+            ) {
                 when (selectedCity) {
                     "Cartagena" -> CartagenaListScreen(query, category, onNavigateToDetail)
                     "Ibagué" -> IbagueListScreen(query, category, onNavigateToIbagueDetail)
