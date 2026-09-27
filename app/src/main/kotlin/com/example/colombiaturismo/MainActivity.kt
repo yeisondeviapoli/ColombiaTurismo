@@ -128,54 +128,93 @@ fun ColombiaTurismoApp() {
                 )
             }
         ) {
-            when (screen) {
-                "ibague_detail" -> selectedIbaguePlace?.let { place ->
-                    IbagueDetailScreen(place = place, onBack = { screen = "home" })
-                }
-                "medellin_detail" -> selectedMedellinPlace?.let { place ->
-                    MedellinDetailScreen(place = place, onBack = { screen = "home" })
-                }
-                "cartagena_detail" -> {
-                    val place = selectedCartagenaPlace
-                    if (place != null) {
-                        CartagenaDetailScreen(
-                            place = place,
-                            onBack = { screen = "home" }
+            Column(Modifier.fillMaxSize()) {
+                Box(Modifier.weight(1f)) {
+                    when (screen) {
+                        "ibague_detail" -> selectedIbaguePlace?.let { place ->
+                            IbagueDetailScreen(place = place, onBack = { screen = "home" })
+                        }
+                        "medellin_detail" -> selectedMedellinPlace?.let { place ->
+                            MedellinDetailScreen(place = place, onBack = { screen = "home" })
+                        }
+                        "cartagena_detail" -> {
+                            val place = selectedCartagenaPlace
+                            if (place != null) {
+                                CartagenaDetailScreen(
+                                    place = place,
+                                    onBack = { screen = "home" }
+                                )
+                            }
+                        }
+                        "bogota_detail" -> {
+                            val place = selectedBogotaPlace
+                            if (place != null) {
+                                BogotaDetailScreen(
+                                    place = place,
+                                    onBack = { screen = "home" }
+                                )
+                            }
+                        }
+                        else -> HomeScreen(
+                            onNavigateToIbagueDetail = { place ->
+                                selectedIbaguePlace = place
+                                screen = "ibague_detail"
+                            },
+                            onNavigateToMedellinDetail = { place ->
+                                selectedMedellinPlace = place
+                                screen = "medellin_detail"
+                            },
+                            onNavigateToDetail = { place ->
+                                selectedCartagenaPlace = place
+                                screen = "cartagena_detail"
+                            },
+                            onNavigateToBogotaDetail = { place ->
+                                selectedBogotaPlace = place
+                                screen = "bogota_detail"
+                            },
+                            onMenuClick = {
+                                scope.launch { drawerState.open() }
+                            }
                         )
                     }
                 }
-                "bogota_detail" -> {
-                    val place = selectedBogotaPlace
-                    if (place != null) {
-                        BogotaDetailScreen(
-                            place = place,
-                            onBack = { screen = "home" }
-                        )
-                    }
-                }
-                else -> HomeScreen(
-                    onNavigateToIbagueDetail = { place ->
-                        selectedIbaguePlace = place
-                        screen = "ibague_detail"
-                    },
-                    onNavigateToMedellinDetail = { place ->
-                        selectedMedellinPlace = place
-                        screen = "medellin_detail"
-                    },
-                    onNavigateToDetail = { place ->
-                        selectedCartagenaPlace = place
-                        screen = "cartagena_detail"
-                    },
-                    onNavigateToBogotaDetail = { place ->
-                        selectedBogotaPlace = place
-                        screen = "bogota_detail"
-                    },
-                    onMenuClick = {
-                        scope.launch { drawerState.open() }
-                    }
-                )
+                AppBottomBar(onExploreClick = { screen = "home" })
             }
         }
+    }
+}
+
+@Composable
+fun AppBottomBar(onExploreClick: () -> Unit) {
+    val itemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = Navy,
+        selectedTextColor = Navy,
+        indicatorColor = Color(0xFFE2E8F0),
+        unselectedIconColor = Muted,
+        unselectedTextColor = Muted
+    )
+    NavigationBar(containerColor = Color.White) {
+        NavigationBarItem(
+            selected = true,
+            onClick = onExploreClick,
+            icon = { Icon(Icons.Outlined.Explore, null) },
+            colors = itemColors,
+            label = { Text("Explorar") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { },
+            icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
+            colors = itemColors,
+            label = { Text("Favoritos") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { },
+            icon = { Icon(Icons.Outlined.Person, null) },
+            colors = itemColors,
+            label = { Text("Perfil") }
+        )
     }
 }
 
