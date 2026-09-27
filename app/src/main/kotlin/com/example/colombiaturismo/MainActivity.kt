@@ -17,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -43,6 +44,7 @@ import com.example.colombiaturismo.ibague.IbaguePlace
 import com.example.colombiaturismo.medellin.MedellinDetailScreen
 import com.example.colombiaturismo.medellin.MedellinListScreen
 import com.example.colombiaturismo.medellin.MedellinPlace
+import kotlinx.coroutines.launch
 
 private val Navy = Color(0xFF24455F)
 private val NavyText = Color(0xFF1F3F5C)
@@ -97,6 +99,8 @@ fun ColombiaTurismoApp() {
     var selectedIbaguePlace by remember { mutableStateOf<IbaguePlace?>(null) }
     var selectedMedellinPlace by remember { mutableStateOf<MedellinPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
     BackHandler(enabled = screen != "home") {
         screen = "home"
@@ -108,50 +112,101 @@ fun ColombiaTurismoApp() {
             .safeDrawingPadding(),
         color = Page
     ) {
-        when (screen) {
-            "ibague_detail" -> selectedIbaguePlace?.let { place ->
-                IbagueDetailScreen(place = place, onBack = { screen = "home" })
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            gesturesEnabled = screen == "home",
+            drawerContent = {
+                AppDrawer(
+                    drawerState = drawerState,
+                    onHomeClick = {
+                        screen = "home"
+                        scope.launch { drawerState.close() }
+                    },
+                    onLogoutClick = {
+                        scope.launch { drawerState.close() }
+                    }
+                )
             }
-            "medellin_detail" -> selectedMedellinPlace?.let { place ->
-                MedellinDetailScreen(place = place, onBack = { screen = "home" })
-            }
-            "cartagena_detail" -> {
-                val place = selectedCartagenaPlace
-                if (place != null) {
-                    CartagenaDetailScreen(
-                        place = place,
-                        onBack = { screen = "home" }
-                    )
+        ) {
+            when (screen) {
+                "ibague_detail" -> selectedIbaguePlace?.let { place ->
+                    IbagueDetailScreen(place = place, onBack = { screen = "home" })
                 }
-            }
-            "bogota_detail" -> {
-                val place = selectedBogotaPlace
-                if (place != null) {
-                    BogotaDetailScreen(
-                        place = place,
-                        onBack = { screen = "home" }
-                    )
+                "medellin_detail" -> selectedMedellinPlace?.let { place ->
+                    MedellinDetailScreen(place = place, onBack = { screen = "home" })
                 }
-            }
-            else -> HomeScreen(
-                onNavigateToIbagueDetail = { place ->
-                    selectedIbaguePlace = place
-                    screen = "ibague_detail"
-                },
-                onNavigateToMedellinDetail = { place ->
-                    selectedMedellinPlace = place
-                    screen = "medellin_detail"
-                },
-                onNavigateToDetail = { place ->
-                    selectedCartagenaPlace = place
-                    screen = "cartagena_detail"
-                },
-                onNavigateToBogotaDetail = { place ->
-                    selectedBogotaPlace = place
-                    screen = "bogota_detail"
+                "cartagena_detail" -> {
+                    val place = selectedCartagenaPlace
+                    if (place != null) {
+                        CartagenaDetailScreen(
+                            place = place,
+                            onBack = { screen = "home" }
+                        )
+                    }
                 }
-            )
+                "bogota_detail" -> {
+                    val place = selectedBogotaPlace
+                    if (place != null) {
+                        BogotaDetailScreen(
+                            place = place,
+                            onBack = { screen = "home" }
+                        )
+                    }
+                }
+                else -> HomeScreen(
+                    onNavigateToIbagueDetail = { place ->
+                        selectedIbaguePlace = place
+                        screen = "ibague_detail"
+                    },
+                    onNavigateToMedellinDetail = { place ->
+                        selectedMedellinPlace = place
+                        screen = "medellin_detail"
+                    },
+                    onNavigateToDetail = { place ->
+                        selectedCartagenaPlace = place
+                        screen = "cartagena_detail"
+                    },
+                    onNavigateToBogotaDetail = { place ->
+                        selectedBogotaPlace = place
+                        screen = "bogota_detail"
+                    },
+                    onMenuClick = {
+                        scope.launch { drawerState.open() }
+                    }
+                )
+            }
         }
+    }
+}
+
+@Composable
+fun AppDrawer(
+    drawerState: DrawerState,
+    onHomeClick: () -> Unit,
+    onLogoutClick: () -> Unit
+) {
+    ModalDrawerSheet(drawerState = drawerState) {
+        Text(
+            "Colom-Via",
+            color = NavyText,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(24.dp)
+        )
+        NavigationDrawerItem(
+            label = { Text("Home") },
+            icon = { Icon(Icons.Outlined.Home, null) },
+            selected = false,
+            onClick = onHomeClick,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+        NavigationDrawerItem(
+            label = { Text("Cerrar sesión") },
+            icon = { Icon(Icons.AutoMirrored.Outlined.Logout, null) },
+            selected = false,
+            onClick = onLogoutClick,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
     }
 }
 
@@ -159,7 +214,8 @@ fun ColombiaTurismoApp() {
 fun AppHeader(
     title: String,
     subtitle: String,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -177,6 +233,11 @@ fun AppHeader(
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
             } else {
+                if (onMenuClick != null) {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Outlined.Menu, "Menú", tint = Color.White)
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .size(42.dp)
@@ -232,14 +293,15 @@ fun HomeScreen(
     onNavigateToIbagueDetail: (IbaguePlace) -> Unit,
     onNavigateToMedellinDetail: (MedellinPlace) -> Unit,
     onNavigateToDetail: (CartagenaPlace) -> Unit,
-    onNavigateToBogotaDetail: (BogotaPlace) -> Unit
+    onNavigateToBogotaDetail: (BogotaPlace) -> Unit,
+    onMenuClick: () -> Unit
 ) {
     var selectedCity by remember { mutableStateOf("Bogotá") }
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("Todos") }
 
     Column(Modifier.fillMaxSize()) {
-        AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?")
+        AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?", onMenuClick = onMenuClick)
         Spacer(Modifier.height(13.dp))
         SearchBar(query = query, onQueryChange = { query = it })
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
