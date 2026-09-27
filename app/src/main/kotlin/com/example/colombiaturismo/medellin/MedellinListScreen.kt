@@ -1,4 +1,4 @@
-package com.example.colombiaturismo.ibague
+package com.example.colombiaturismo.medellin
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,14 +27,14 @@ private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 
 @Composable
-fun IbagueListScreen(query: String = "", category: String = "Todos", onPlaceClick: (IbaguePlace) -> Unit) {
-    val filteredPlaces = ibaguePlaces.filter { place ->
+fun MedellinListScreen(query: String = "", category: String = "Todos", onPlaceClick: (MedellinPlace) -> Unit) {
+    val filteredPlaces = medellinPlaces.filter { place ->
         val text = "${place.name} ${place.location} ${place.description}".lowercase()
         text.contains(query.trim().lowercase()) && (category == "Todos" ||
             when (category) {
-                "Cultura" -> text.contains("músic") || text.contains("cultural") || text.contains("patrimonio")
-                "Historia" -> text.contains("históric") || text.contains("patrimonio")
-                "Naturaleza" -> text.contains("natural") || text.contains("montaña") || text.contains("flora")
+                "Cultura" -> text.contains("arte") || text.contains("cultura") || text.contains("museo")
+                "Historia" -> text.contains("histori") || text.contains("tradicional")
+                "Naturaleza" -> text.contains("montaña") || text.contains("flores")
                 else -> false
             })
     }
@@ -44,8 +44,8 @@ fun IbagueListScreen(query: String = "", category: String = "Todos", onPlaceClic
     ) {
         item {
             Column(Modifier.padding(start = 4.dp, bottom = 2.dp)) {
-                Text("Ibagué", color = DarkText, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("La ciudad musical de Colombia", color = MutedText, fontSize = 12.sp)
+                Text("Medellín", color = DarkText, fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                Text("Innovación, arte y montaña", color = MutedText, fontSize = 12.sp)
             }
         }
         if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
@@ -57,14 +57,7 @@ fun IbagueListScreen(query: String = "", category: String = "Todos", onPlaceClic
                 modifier = Modifier.fillMaxWidth().clickable { onPlaceClick(place) }
             ) {
                 Column(Modifier.padding(12.dp)) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(125.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(place.placeholderColor),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(Modifier.fillMaxWidth().height(125.dp).clip(RoundedCornerShape(12.dp)).background(place.placeholderColor)) {
                         Image(
                             painter = painterResource(place.imageRes),
                             contentDescription = place.name,

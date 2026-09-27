@@ -28,15 +28,28 @@ private val DarkText = Color(0xFF1F3F5C)
 
 @Composable
 fun BogotaListScreen(
+    query: String = "",
+    category: String = "Todos",
     onPlaceClick: (BogotaPlace) -> Unit = {}
 ) {
+    val filteredPlaces = bogotaPlaces.filter { place ->
+        val text = "${place.name} ${place.location} ${place.description}".lowercase()
+        text.contains(query.trim().lowercase()) && (category == "Todos" ||
+            when (category) {
+                "Cultura" -> text.contains("museo") || text.contains("cultural") || text.contains("arte")
+                "Historia" -> text.contains("histori") || text.contains("colonial") || text.contains("plaza")
+                "Naturaleza" -> text.contains("montaña") || text.contains("sendero") || text.contains("sabana")
+                else -> false
+            })
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(end = 12.dp, top = 8.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(bogotaPlaces) { place ->
+        if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
+        items(filteredPlaces) { place ->
             BogotaCard(place = place, onClick = { onPlaceClick(place) })
         }
     }

@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import kotlinx.coroutines.launch
 import com.example.colombiaturismo.bogota.BogotaDetailScreen
 import com.example.colombiaturismo.bogota.BogotaListScreen
 import com.example.colombiaturismo.bogota.BogotaPlace
@@ -37,6 +41,9 @@ import com.example.colombiaturismo.cartagena.CartagenaPlace
 import com.example.colombiaturismo.ibague.IbagueDetailScreen
 import com.example.colombiaturismo.ibague.IbagueListScreen
 import com.example.colombiaturismo.ibague.IbaguePlace
+import com.example.colombiaturismo.medellin.MedellinDetailScreen
+import com.example.colombiaturismo.medellin.MedellinListScreen
+import com.example.colombiaturismo.medellin.MedellinPlace
 
 private val Navy = Color(0xFF24455F)
 private val NavyText = Color(0xFF1F3F5C)
@@ -89,6 +96,7 @@ fun ColombiaTurismoApp() {
     var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
     var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
     var selectedIbaguePlace by remember { mutableStateOf<IbaguePlace?>(null) }
+    var selectedMedellinPlace by remember { mutableStateOf<MedellinPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
 
     BackHandler(enabled = screen != "home") {
@@ -104,6 +112,9 @@ fun ColombiaTurismoApp() {
         when (screen) {
             "ibague_detail" -> selectedIbaguePlace?.let { place ->
                 IbagueDetailScreen(place = place, onBack = { screen = "home" })
+            }
+            "medellin_detail" -> selectedMedellinPlace?.let { place ->
+                MedellinDetailScreen(place = place, onBack = { screen = "home" })
             }
             "cartagena_detail" -> {
                 val place = selectedCartagenaPlace
@@ -128,6 +139,10 @@ fun ColombiaTurismoApp() {
                     selectedIbaguePlace = place
                     screen = "ibague_detail"
                 },
+                onNavigateToMedellinDetail = { place ->
+                    selectedMedellinPlace = place
+                    screen = "medellin_detail"
+                },
                 onNavigateToDetail = { place ->
                     selectedCartagenaPlace = place
                     screen = "cartagena_detail"
@@ -145,7 +160,8 @@ fun ColombiaTurismoApp() {
 fun AppHeader(
     title: String,
     subtitle: String,
-    onBack: (() -> Unit)? = null
+    onBack: (() -> Unit)? = null,
+    onMenuClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -163,6 +179,11 @@ fun AppHeader(
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
             } else {
+                if (onMenuClick != null) {
+                    IconButton(onClick = onMenuClick) {
+                        Icon(Icons.Outlined.Menu, "Abrir ciudades", tint = Color.White)
+                    }
+                }
                 Box(
                     modifier = Modifier
                         .size(42.dp)
@@ -186,95 +207,73 @@ fun AppHeader(
 }
 
 @Composable
-fun SearchBar() {
+fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(50))
             .background(Color.White)
-            .padding(horizontal = 15.dp, vertical = 10.dp),
+            .padding(horizontal = 15.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(Icons.Outlined.Search, null, tint = Color(0xFF8AA0B2), modifier = Modifier.size(17.dp))
         Spacer(Modifier.width(9.dp))
-        Text("Buscar ciudad o lugar…", color = Color(0xFF8AA0B2), fontSize = 12.sp)
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            textStyle = LocalTextStyle.current.copy(color = NavyText, fontSize = 12.sp),
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 7.dp),
+            decorationBox = { field ->
+                if (query.isEmpty()) Text("Buscar ciudad o lugar…", color = Color(0xFF8AA0B2), fontSize = 12.sp)
+                field()
+            }
+        )
     }
 }
 
 @Composable
 fun HomeScreen(
     onNavigateToIbagueDetail: (IbaguePlace) -> Unit,
+    onNavigateToMedellinDetail: (MedellinPlace) -> Unit,
     onNavigateToDetail: (CartagenaPlace) -> Unit,
     onNavigateToBogotaDetail: (BogotaPlace) -> Unit
 ) {
     var selectedCity by remember { mutableStateOf("Bogotá") }
+    var query by remember { mutableStateOf("") }
+    var category by remember { mutableStateOf("Todos") }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
 
-    Column(Modifier.fillMaxSize()) {
-        AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?")
-
-        Column(Modifier.fillMaxSize()) {
-            Spacer(Modifier.height(13.dp))
-            SearchBar()
-
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp),
-                horizontalArrangement = Arrangement.spacedBy(7.dp)
-            ) {
-                FilterChip(text = "Todos", selected = true)
-                FilterChip(text = "Cultura", selected = false)
-                FilterChip(text = "Playas", selected = false)
-                FilterChip(text = "Naturaleza", selected = false)
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text("Ciudades", modifier = Modifier.padding(24.dp), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = NavyText)
+                CityRail(selectedCity = selectedCity, onCitySelect = { city ->
+                    selectedCity = city
+                    scope.launch { drawerState.close() }
+                })
             }
-
-            Row(Modifier.fillMaxSize()) {
-                // Columna 1: Menú lateral de ciudades
-                CityRail(
-                    selectedCity = selectedCity,
-                    onCitySelect = { city ->
-                        selectedCity = city
-                    }
-                )
-
-                // CORRECCIÓN 1: Renderizado dinámico según la ciudad seleccionada
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                ) {
-                    when (selectedCity) {
-                        "Cartagena" -> {
-                            CartagenaListScreen(
-                                onPlaceClick = { place ->
-                                    onNavigateToDetail(place)
-                                }
-                            )
-                        }
-                        "Ibagué" -> {
-                            IbagueListScreen(
-                                onPlaceClick = onNavigateToIbagueDetail
-                            )
-                        }
-                        "Medellín" -> {
-                            HomeFeatured(
-                                cityName = "Medellín",
-                                subtitle = "Innovación y vida",
-                                places = listOf(
-                                    Place("Parque Arví", "Naturaleza y cables turísticos.", "Naturaleza", "4.8", Color(0xFFC0DD97)),
-                                    Place("Comuna 13", "Arte urbano y transformación.", "Cultura", "4.9", Color(0xFFF4C77B))
-                                ),
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                        else -> {
-                            // Bogotá por defecto
-                            BogotaListScreen(
-                                onPlaceClick = { place ->
-                                    onNavigateToBogotaDetail(place)
-                                }
-                            )
-                        }
-                    }
+        }
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?", onMenuClick = { scope.launch { drawerState.open() } })
+            Spacer(Modifier.height(13.dp))
+            SearchBar(query = query, onQueryChange = { query = it })
+            Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
+                listOf("Todos", "Cultura", "Naturaleza", "Historia", "Playas").forEach { option ->
+                    FilterChip(text = option, selected = category == option, onClick = { category = option })
+                }
+            }
+            Box(Modifier.fillMaxSize()) {
+                when (selectedCity) {
+                    "Cartagena" -> CartagenaListScreen(query, category, onNavigateToDetail)
+                    "Ibagué" -> IbagueListScreen(query, category, onNavigateToIbagueDetail)
+                    "Medellín" -> MedellinListScreen(query, category, onNavigateToMedellinDetail)
+                    else -> BogotaListScreen(query, category, onNavigateToBogotaDetail)
                 }
             }
         }
@@ -282,15 +281,11 @@ fun HomeScreen(
 }
 
 @Composable
-fun FilterChip(text: String, selected: Boolean) {
+fun FilterChip(text: String, selected: Boolean, onClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(50))
-            .background(if (selected) Navy else Color.Transparent)
-            .padding(horizontal = if (selected) 14.dp else 10.dp, vertical = 6.dp)
-    ) {
-        Text(text, color = if (selected) Color.White else Muted, fontSize = 11.sp)
-    }
+        modifier = Modifier.clip(RoundedCornerShape(50)).background(if (selected) Navy else Color.Transparent)
+            .clickable(onClick = onClick).padding(horizontal = if (selected) 14.dp else 10.dp, vertical = 6.dp)
+    ) { Text(text, color = if (selected) Color.White else Muted, fontSize = 11.sp) }
 }
 
 @Composable
@@ -358,6 +353,13 @@ fun CityMiniCard(
             } else if (city.name == "Ibagué") {
                 Image(
                     painter = painterResource(id = R.drawable.combeima),
+                    contentDescription = city.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else if (city.name == "Medellín") {
+                Image(
+                    painter = painterResource(id = R.drawable.pueblitopaisa),
                     contentDescription = city.name,
                     contentScale = androidx.compose.ui.layout.ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
