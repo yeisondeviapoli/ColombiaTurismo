@@ -28,15 +28,29 @@ private val DarkText = Color(0xFF1F3F5C)
 
 @Composable
 fun CartagenaListScreen(
+    query: String = "",
+    category: String = "Todos",
     onPlaceClick: (CartagenaPlace) -> Unit = {}
 ) {
+    val filteredPlaces = cartagenaPlaces.filter { place ->
+        val text = "${place.name} ${place.location} ${place.description}".lowercase()
+        text.contains(query.trim().lowercase()) && (category == "Todos" ||
+            when (category) {
+                "Playas" -> text.contains("playa") || text.contains("mar") || text.contains("isla") || text.contains("cost")
+                "Historia" -> text.contains("histori") || text.contains("colonial") || text.contains("castillo") || text.contains("convento")
+                "Naturaleza" -> text.contains("natural") || text.contains("coral") || text.contains("isla")
+                "Cultura" -> text.contains("cultural") || text.contains("ciudad")
+                else -> false
+            })
+    }
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(end = 12.dp, top = 8.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(cartagenaPlaces) { place ->
+        if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
+        items(filteredPlaces) { place ->
             CartagenaCard(place = place, onClick = { onPlaceClick(place) })
         }
     }
