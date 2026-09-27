@@ -224,27 +224,46 @@ fun AppDrawer(
     onHomeClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
-    ModalDrawerSheet(drawerState = drawerState) {
-        Text(
-            "Colom-Via",
-            color = NavyText,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(24.dp)
-        )
-        NavigationDrawerItem(
-            label = { Text("Home") },
-            icon = { Icon(Icons.Outlined.Home, null) },
-            selected = false,
-            onClick = onHomeClick,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+    ModalDrawerSheet(
+        drawerState = drawerState,
+        drawerContainerColor = Navy
+    ) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                "Colom-Via",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(24.dp)
+            )
+            NavigationDrawerItem(
+                label = { Text("Home") },
+                icon = { Icon(Icons.Outlined.Home, null) },
+                selected = false,
+                onClick = onHomeClick,
+                colors = NavigationDrawerItemDefaults.colors(
+                    unselectedContainerColor = Color.Transparent,
+                    unselectedIconColor = Color.White,
+                    unselectedTextColor = Color.White
+                ),
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+        }
         NavigationDrawerItem(
             label = { Text("Cerrar sesión") },
             icon = { Icon(Icons.AutoMirrored.Outlined.Logout, null) },
             selected = false,
             onClick = onLogoutClick,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            colors = NavigationDrawerItemDefaults.colors(
+                unselectedContainerColor = Color.White.copy(alpha = 0.12f),
+                unselectedIconColor = Color.White,
+                unselectedTextColor = Color.White
+            ),
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 16.dp)
         )
     }
 }
