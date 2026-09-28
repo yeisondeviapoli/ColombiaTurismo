@@ -1,5 +1,7 @@
 package com.example.colombiaturismo.ibague
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun IbagueDetailScreen(place: IbaguePlace, onBack: () -> Unit) {
     val isSaved = remember { mutableStateOf(false) }
+    val context = LocalContext.current // <--- Obtenemos el contexto aquí
 
     Column(Modifier.fillMaxSize().background(Color(0xFF0D233A)).verticalScroll(rememberScrollState())) {
         Box(Modifier.fillMaxWidth().height(280.dp).background(place.placeholderColor), contentAlignment = Alignment.Center) {
@@ -90,8 +94,15 @@ fun IbagueDetailScreen(place: IbaguePlace, onBack: () -> Unit) {
                 }
 
                 Spacer(Modifier.height(24.dp))
+
+                // --- BOTÓN CÓMO LLEGAR ACTUALIZADO ---
                 Button(
-                    onClick = { },
+                    onClick = {
+                        // Creamos la URI con las coordenadas del lugar y su nombre para Google Maps
+                        val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        context.startActivity(intent)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D233A)),
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().height(52.dp)

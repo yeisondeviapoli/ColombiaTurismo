@@ -14,5 +14,7 @@ data class IbaguePlace(
     val price: String,
     @DrawableRes val imageRes: Int,
     val placeholderColor: Color,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val latitude: Double,   // Añadido para el Maps
+    val longitude: Double   // Añadido para el Maps
 )

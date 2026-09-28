@@ -1,5 +1,7 @@
 package com.example.colombiaturismo.medellin
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -37,6 +40,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun MedellinDetailScreen(place: MedellinPlace, onBack: () -> Unit) {
     val isSaved = remember { mutableStateOf(false) }
+    val context = LocalContext.current // <--- Contexto para abrir Google Maps
 
     Column(Modifier.fillMaxSize().background(Color(0xFF0D233A)).verticalScroll(rememberScrollState())) {
         Box(Modifier.fillMaxWidth().height(280.dp)) {
@@ -90,7 +94,12 @@ fun MedellinDetailScreen(place: MedellinPlace, onBack: () -> Unit) {
 
                 Spacer(Modifier.height(24.dp))
                 Button(
-                    onClick = { },
+                    onClick = {
+                        // Acción para abrir Google Maps con las coordenadas del lugar
+                        val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        context.startActivity(intent)
+                    },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D233A)),
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().height(52.dp)
