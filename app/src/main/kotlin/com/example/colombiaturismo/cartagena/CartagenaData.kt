@@ -3,7 +3,7 @@ package com.example.colombiaturismo.cartagena
 import androidx.annotation.DrawableRes
 import com.example.colombiaturismo.R
 
-// Definimos la clase incluyendo el recurso de la imagen
+// Definimos la clase incluyendo las coordenadas y el recurso de la imagen
 data class CartagenaPlace(
     val id: String,
     val name: String,
@@ -12,10 +12,12 @@ data class CartagenaPlace(
     val rating: Double,
     val schedule: String,
     val price: String,
-    @DrawableRes val imageRes: Int // Referencia al recurso de imagen en drawable
+    val latitude: Double,   // Coordenada de latitud añadida
+    val longitude: Double,  // Coordenada de longitud añadida
+    @DrawableRes val imageRes: Int
 )
 
-// Lista con los 5 sitios principales de Cartagena con descripciones extendidas
+// Lista con los 5 sitios principales de Cartagena con coordenadas exactas
 val cartagenaPlaces = listOf(
     CartagenaPlace(
         id = "1",
@@ -25,6 +27,8 @@ val cartagenaPlaces = listOf(
         rating = 4.9,
         schedule = "Abierto 24 horas",
         price = "Gratis",
+        latitude = 10.4237,
+        longitude = -75.5529,
         imageRes = R.drawable.ciudad_amurallada
     ),
     CartagenaPlace(
@@ -35,6 +39,8 @@ val cartagenaPlaces = listOf(
         rating = 4.8,
         schedule = "8:00 AM - 6:00 PM",
         price = "$30.000 COP",
+        latitude = 10.4208,
+        longitude = -75.5451,
         imageRes = R.drawable.san_felipe
     ),
     CartagenaPlace(
@@ -45,6 +51,8 @@ val cartagenaPlaces = listOf(
         rating = 4.9,
         schedule = "Salidas 7:00 AM",
         price = "Varía según tour",
+        latitude = 10.1853,
+        longitude = -75.7483,
         imageRes = R.drawable.islas_rosario
     ),
     CartagenaPlace(
@@ -55,16 +63,20 @@ val cartagenaPlaces = listOf(
         rating = 4.5,
         schedule = "Abierto 24 horas",
         price = "Gratis",
+        latitude = 10.4042,
+        longitude = -75.5564,
         imageRes = R.drawable.bocagrande
     ),
     CartagenaPlace(
         id = "5",
         name = "Convento de la Popa",
         location = "Alto de La Popa",
-        description = "Situado en la cima del cerro de La Popa —el punto más alto de Cartagena a unos 150 metros sobre el nivel del mar se encuentra este histórico convento e iglesia consagrada a la Virgen de la Candelaria. Fundado a principios del siglo XVII por agustinos recoletos, ofrece sin duda el mirador panorámico de 360 grados más impresionante de toda la ciudad, abarcando la bahía, el mar Caribe y los techos coloniales.",
+        description = "Situado en la cima del cerro de La Popa el punto más alto de Cartagena a unos 150 metros sobre el nivel del mar se encuentra este histórico convento e iglesia consagrada a la Virgen de la Candelaria. Fundado a principios del siglo XVII por agustinos recoletos, ofrece sin duda el mirador panorámico de 360 grados más impresionante de toda la ciudad, abarcando la bahía, el mar Caribe y los techos coloniales.",
         rating = 4.7,
         schedule = "8:00 AM - 5:00 PM",
         price = "$20.000 COP",
+        latitude = 10.4278,
+        longitude = -75.5348,
         imageRes = R.drawable.convento_popa
     )
 )

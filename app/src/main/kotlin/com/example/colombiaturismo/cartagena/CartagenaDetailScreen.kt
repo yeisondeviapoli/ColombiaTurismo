@@ -1,5 +1,8 @@
 package com.example.colombiaturismo.cartagena
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,10 +37,12 @@ fun CartagenaDetailScreen(
     place: CartagenaPlace,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy) // Fondo general oscuro para la barra de estado y zona superior
+            .background(DarkNavy)
     ) {
         Column(
             modifier = Modifier
@@ -79,7 +85,16 @@ fun CartagenaDetailScreen(
                     }
 
                     IconButton(
-                        onClick = { /* Acción compartir */ },
+                        onClick = {
+                            val shareMessage = "¡Mira este lugar increíble en Cartagena: ${place.name}! Ubicado en ${place.location}."
+                            val sendIntent = Intent().apply {
+                                action = Intent.ACTION_SEND
+                                putExtra(Intent.EXTRA_TEXT, shareMessage)
+                                type = "text/plain"
+                            }
+                            val shareIntent = Intent.createChooser(sendIntent, null)
+                            context.startActivity(shareIntent)
+                        },
                         modifier = Modifier
                             .size(40.dp)
                             .background(Color.Black.copy(alpha = 0.4f), CircleShape)
@@ -93,11 +108,11 @@ fun CartagenaDetailScreen(
                 }
             }
 
-            // 2. Contenedor principal con esquinas superiores redondeadas (Efecto tarjeta flotante)
+            // 2. Contenedor principal con esquinas superiores redondeadas
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .offset(y = (-24.dp)), // Solapa superior sobre la imagen
+                    .offset(y = (-24.dp)),
                 shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
                 color = Color.White,
                 shadowElevation = 8.dp
@@ -123,7 +138,7 @@ fun CartagenaDetailScreen(
 
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFFFEbee),
+                            color = Color(0xFFFFEBEE),
                             modifier = Modifier.size(42.dp)
                         ) {
                             Box(contentAlignment = Alignment.Center) {
@@ -168,7 +183,6 @@ fun CartagenaDetailScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        // Tarjeta Horario
                         Card(
                             colors = CardDefaults.cardColors(containerColor = LightCardBg),
                             shape = RoundedCornerShape(14.dp),
@@ -200,7 +214,6 @@ fun CartagenaDetailScreen(
                             }
                         }
 
-                        // Tarjeta Precio
                         Card(
                             colors = CardDefaults.cardColors(containerColor = LightCardBg),
                             shape = RoundedCornerShape(14.dp),
@@ -245,7 +258,7 @@ fun CartagenaDetailScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Tarjeta de ubicación (Miniatura + Dirección)
+                    // Tarjeta de ubicación
                     Card(
                         colors = CardDefaults.cardColors(containerColor = LightCardBg),
                         shape = RoundedCornerShape(14.dp),
@@ -257,7 +270,6 @@ fun CartagenaDetailScreen(
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            // Miniatura simulada del mapa con pin
                             Box(
                                 modifier = Modifier
                                     .size(70.dp)
@@ -275,7 +287,6 @@ fun CartagenaDetailScreen(
 
                             Spacer(modifier = Modifier.width(14.dp))
 
-                            // Texto de dirección detallada
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = place.location,
@@ -298,7 +309,21 @@ fun CartagenaDetailScreen(
 
                     // Botón inferior "Cómo llegar"
                     Button(
-                        onClick = { /* Acción de mapas */ },
+                        onClick = {
+                            val gmmIntentUri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
+                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
+                                setPackage("com.google.android.apps.maps")
+                            }
+                            try {
+                                context.startActivity(mapIntent)
+                            } catch (e: ActivityNotFoundException) {
+                                val webIntent = Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse("https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}")
+                                )
+                                context.startActivity(webIntent)
+                            }
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkNavy),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier
