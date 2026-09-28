@@ -1,18 +1,13 @@
 package com.example.colombiaturismo.bogota
 
-import androidx.annotation.DrawableRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountBalance
+import androidx.compose.material.icons.outlined.Landscape
+import androidx.compose.material.icons.outlined.MonetizationOn
+import androidx.compose.material.icons.outlined.Museum
+import androidx.compose.material.icons.outlined.Place
+import androidx.compose.ui.graphics.Color
 import com.example.colombiaturismo.R
-
-data class BogotaPlace(
-    val id: String,
-    val name: String,
-    val location: String,
-    val description: String,
-    val rating: Double,
-    val schedule: String,
-    val price: String,
-    @DrawableRes val imageRes: Int
-)
 
 val bogotaPlaces = listOf(
     BogotaPlace(
@@ -23,7 +18,11 @@ val bogotaPlaces = listOf(
         rating = 4.9,
         schedule = "Lun - Sáb 6:30 AM - 11:00 PM",
         price = "Gratis",
-        imageRes = R.drawable.monserrate
+        imageRes = R.drawable.monserrate,
+        placeholderColor = Color(0xFFAED8C0),
+        icon = Icons.Outlined.Landscape,
+        latitude = 4.6058,
+        longitude = -74.0558
     ),
     BogotaPlace(
         id = "2",
@@ -33,7 +32,11 @@ val bogotaPlaces = listOf(
         rating = 4.8,
         schedule = "Mar - Sáb 9:00 AM - 7:00 PM",
         price = "$5.000 COP (domingos gratis)",
-        imageRes = R.drawable.museo_oro
+        imageRes = R.drawable.museo_oro,
+        placeholderColor = Color(0xFFF4C77B),
+        icon = Icons.Outlined.MonetizationOn,
+        latitude = 4.6015,
+        longitude = -74.0721
     ),
     BogotaPlace(
         id = "3",
@@ -43,7 +46,11 @@ val bogotaPlaces = listOf(
         rating = 4.7,
         schedule = "Abierto 24 horas",
         price = "Gratis",
-        imageRes = R.drawable.la_candelaria
+        imageRes = R.drawable.la_candelaria,
+        placeholderColor = Color(0xFFF3A68D),
+        icon = Icons.Outlined.Place,
+        latitude = 4.5962,
+        longitude = -74.0735
     ),
     BogotaPlace(
         id = "4",
@@ -53,7 +60,11 @@ val bogotaPlaces = listOf(
         rating = 4.8,
         schedule = "Lun, Mié - Sáb 9:00 AM - 7:00 PM",
         price = "Gratis",
-        imageRes = R.drawable.museo_botero
+        imageRes = R.drawable.museo_botero,
+        placeholderColor = Color(0xFFC5DEA2),
+        icon = Icons.Outlined.Museum,
+        latitude = 4.5960,
+        longitude = -74.0738
     ),
     BogotaPlace(
         id = "5",
@@ -63,6 +74,10 @@ val bogotaPlaces = listOf(
         rating = 4.6,
         schedule = "Abierto 24 horas",
         price = "Gratis",
-        imageRes = R.drawable.plaza_bolivar
+        imageRes = R.drawable.plaza_bolivar,
+        placeholderColor = Color(0xFFB9D4EC),
+        icon = Icons.Outlined.AccountBalance,
+        latitude = 4.5981,
+        longitude = -74.0760
     )
 )

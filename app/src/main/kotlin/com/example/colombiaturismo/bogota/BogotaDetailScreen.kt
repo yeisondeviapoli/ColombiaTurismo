@@ -1,5 +1,7 @@
 package com.example.colombiaturismo.bogota
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +36,8 @@ fun BogotaDetailScreen(
     place: BogotaPlace,
     onBack: () -> Unit
 ) {
+    val context = LocalContext.current // <--- Contexto para abrir Google Maps
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -285,7 +290,12 @@ fun BogotaDetailScreen(
                     Spacer(modifier = Modifier.height(28.dp))
 
                     Button(
-                        onClick = { },
+                        onClick = {
+                            // Abrir Google Maps con la latitud, longitud y nombre del lugar de Bogotá
+                            val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            context.startActivity(intent)
+                        },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkNavy),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier
