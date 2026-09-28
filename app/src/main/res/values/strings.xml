@@ -1,3 +1,67 @@
 <resources>
     <string name="app_name">Colombia Turismo</string>
+    <string name="brand_name">Colom-Via</string>
+    <string name="cd_logo">Logo de Colom-Via</string>
+    <string name="cd_volver">Volver</string>
+    <string name="cd_mostrar_contrasena">Mostrar contraseña</string>
+    <string name="cd_ocultar_contrasena">Ocultar contraseña</string>
+
+    <!-- Campos de formulario -->
+    <string name="label_nombre">Nombre completo</string>
+    <string name="hint_nombre">Tu nombre completo</string>
+    <string name="label_correo">Correo electrónico</string>
+    <string name="hint_correo">ejemplo@correo.com</string>
+    <string name="label_contrasena">Contraseña</string>
+    <string name="hint_contrasena">•••••••</string>
+    <string name="label_confirmar_contrasena">Confirmar contraseña</string>
+    <string name="label_contrasena_actual">Contraseña actual</string>
+    <string name="label_nueva_contrasena">Nueva contraseña</string>
+
+    <!-- Pantalla 1: Login -->
+    <string name="login_olvidaste">¿Olvidaste tu contraseña?</string>
+    <string name="login_boton">Iniciar sesión</string>
+    <string name="login_sin_cuenta">¿No tienes cuenta?</string>
+    <string name="login_registrate">Regístrate</string>
+
+    <!-- Pantalla 2: Registro -->
+    <string name="registro_boton">Crear cuenta</string>
+    <string name="registro_con_cuenta">¿Ya tienes cuenta?</string>
+    <string name="registro_inicia_sesion">Inicia sesión</string>
+
+    <!-- Recuperar contraseña -->
+    <string name="recuperar_titulo">Recuperar contraseña</string>
+    <string name="recuperar_descripcion">Confirma el correo y el nombre completo con los que te registraste y crea una nueva contraseña.</string>
+    <string name="recuperar_boton">Restablecer contraseña</string>
+    <string name="info_contrasena_restablecida">Contraseña actualizada. Inicia sesión con tu nueva contraseña.</string>
+
+    <!-- Errores de validación -->
+    <string name="error_nombre_vacio">Ingresa tu nombre completo</string>
+    <string name="error_nombre_corto">El nombre debe tener al menos 3 caracteres</string>
+    <string name="error_correo_vacio">Ingresa tu correo electrónico</string>
+    <string name="error_correo_invalido">Ingresa un correo electrónico válido</string>
+    <string name="error_contrasena_vacia">Ingresa tu contraseña</string>
+    <string name="error_contrasena_debil">Usa al menos 8 caracteres, con letras y números</string>
+    <string name="error_confirmacion_vacia">Confirma tu contraseña</string>
+    <string name="error_contrasenas_no_coinciden">Las contraseñas no coinciden</string>
+    <string name="error_credenciales">Correo o contraseña incorrectos</string>
+    <string name="error_correo_en_uso">Ya existe una cuenta con este correo</string>
+    <string name="error_datos_recuperacion">El correo y el nombre no coinciden con ninguna cuenta</string>
+    <string name="error_contrasena_actual">La contraseña actual no es correcta</string>
+
+    <!-- Perfil -->
+    <string name="perfil_titulo">Perfil</string>
+    <string name="perfil_miembro_desde">Miembro desde el %1$s</string>
+    <string name="perfil_lugares_guardados">Lugares guardados</string>
+    <string name="perfil_lugares_guardados_desc">Tus favoritos se guardan en tu perfil</string>
+    <string name="perfil_seccion_cuenta">Cuenta</string>
+    <string name="perfil_editar_nombre">Editar nombre</string>
+    <string name="perfil_cambiar_contrasena">Cambiar contraseña</string>
+    <string name="perfil_nombre_actualizado">Nombre actualizado</string>
+    <string name="perfil_contrasena_actualizada">Contraseña actualizada</string>
+    <string name="accion_guardar">Guardar</string>
+    <string name="accion_cancelar">Cancelar</string>
+
+    <!-- Cerrar sesión -->
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="cerrar_sesion_mensaje">¿Seguro que quieres cerrar sesión? Tus lugares guardados seguirán en tu perfil.</string>
 </resources>

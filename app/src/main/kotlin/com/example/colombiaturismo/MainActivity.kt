@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +33,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.ImeAction
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.colombiaturismo.auth.AuthFlow
+import com.example.colombiaturismo.auth.SessionState
+import com.example.colombiaturismo.auth.SessionViewModel
 import com.example.colombiaturismo.bogota.BogotaDetailScreen
 import com.example.colombiaturismo.bogota.BogotaListScreen
 import com.example.colombiaturismo.bogota.BogotaPlace
@@ -44,6 +50,8 @@ import com.example.colombiaturismo.ibague.IbaguePlace
 import com.example.colombiaturismo.medellin.MedellinDetailScreen
 import com.example.colombiaturismo.medellin.MedellinListScreen
 import com.example.colombiaturismo.medellin.MedellinPlace
+import com.example.colombiaturismo.profile.LogoutConfirmDialog
+import com.example.colombiaturismo.profile.ProfileRoute
 import kotlinx.coroutines.launch
 
 private val Navy = Color(0xFF24455F)
@@ -86,19 +94,32 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ColombiaTurismoApp()
+            ColomViaRoot()
         }
     }
 }
 
+/** Muestra Login/Registro si no hay sesión y la app cuando el usuario ya inició sesión. */
 @Composable
-fun ColombiaTurismoApp() {
+fun ColomViaRoot(sessionViewModel: SessionViewModel = viewModel(factory = SessionViewModel.Factory)) {
+    val sessionState by sessionViewModel.sessionState.collectAsStateWithLifecycle()
+
+    when (sessionState) {
+        SessionState.Loading -> Box(Modifier.fillMaxSize().background(Color.White))
+        SessionState.LoggedOut -> AuthFlow()
+        is SessionState.LoggedIn -> ColombiaTurismoApp(onLogout = sessionViewModel::logout)
+    }
+}
+
+@Composable
+fun ColombiaTurismoApp(onLogout: () -> Unit) {
     var screen by remember { mutableStateOf("home") }
     var selectedCartagenaPlace by remember { mutableStateOf<CartagenaPlace?>(null) }
     var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
     var selectedIbaguePlace by remember { mutableStateOf<IbaguePlace?>(null) }
     var selectedMedellinPlace by remember { mutableStateOf<MedellinPlace?>(null) }
     var savedCount by remember { mutableIntStateOf(1) }
+    var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -124,6 +145,7 @@ fun ColombiaTurismoApp() {
                     },
                     onLogoutClick = {
                         scope.launch { drawerState.close() }
+                        showLogoutDialog = true
                     }
                 )
             }
@@ -131,6 +153,7 @@ fun ColombiaTurismoApp() {
             Column(Modifier.fillMaxSize()) {
                 Box(Modifier.weight(1f)) {
                     when (screen) {
+                        "perfil" -> ProfileRoute(onLogoutClick = { showLogoutDialog = true })
                         "ibague_detail" -> selectedIbaguePlace?.let { place ->
                             IbagueDetailScreen(place = place, onBack = { screen = "home" })
                         }
@@ -178,14 +201,28 @@ fun ColombiaTurismoApp() {
                         )
                     }
                 }
-                AppBottomBar(onExploreClick = { screen = "home" })
+                AppBottomBar(
+                    currentScreen = screen,
+                    onExploreClick = { screen = "home" },
+                    onProfileClick = { screen = "perfil" }
+                )
             }
         }
+    }
+
+    if (showLogoutDialog) {
+        LogoutConfirmDialog(
+            onConfirm = {
+                showLogoutDialog = false
+                onLogout()
+            },
+            onDismiss = { showLogoutDialog = false }
+        )
     }
 }
 
 @Composable
-fun AppBottomBar(onExploreClick: () -> Unit) {
+fun AppBottomBar(currentScreen: String, onExploreClick: () -> Unit, onProfileClick: () -> Unit) {
     val itemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = Navy,
         selectedTextColor = Navy,
@@ -195,7 +232,7 @@ fun AppBottomBar(onExploreClick: () -> Unit) {
     )
     NavigationBar(containerColor = Color.White) {
         NavigationBarItem(
-            selected = true,
+            selected = currentScreen != "perfil",
             onClick = onExploreClick,
             icon = { Icon(Icons.Outlined.Explore, null) },
             colors = itemColors,
@@ -209,8 +246,8 @@ fun AppBottomBar(onExploreClick: () -> Unit) {
             label = { Text("Favoritos") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { },
+            selected = currentScreen == "perfil",
+            onClick = onProfileClick,
             icon = { Icon(Icons.Outlined.Person, null) },
             colors = itemColors,
             label = { Text("Perfil") }
