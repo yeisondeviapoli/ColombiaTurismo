@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Park
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.ui.graphics.Color
+import com.example.colombiaturismo.PlaceCategory
 import com.example.colombiaturismo.R
 
 val ibaguePlaces = listOf(
@@ -22,7 +23,8 @@ val ibaguePlaces = listOf(
         Color(0xFFAED8C0),
         Icons.Outlined.Landscape,
         4.4520,
-        -75.2050
+        -75.2050,
+        categories = setOf(PlaceCategory.NATURALEZA)
     ),
     IbaguePlace(
         "san-jorge",
@@ -36,7 +38,8 @@ val ibaguePlaces = listOf(
         Color(0xFFC5DEA2),
         Icons.Outlined.Park,
         4.4535,
-        -75.2210
+        -75.2210,
+        categories = setOf(PlaceCategory.NATURALEZA)
     ),
     IbaguePlace(
         "conservatorio",
@@ -50,7 +53,8 @@ val ibaguePlaces = listOf(
         Color(0xFFF4C77B),
         Icons.Outlined.MusicNote,
         4.4436,
-        -75.2444
+        -75.2444,
+        categories = setOf(PlaceCategory.CULTURA, PlaceCategory.HISTORIA)
     ),
     IbaguePlace(
         "plaza-bolivar",
@@ -64,7 +68,8 @@ val ibaguePlaces = listOf(
         Color(0xFFB9D4EC),
         Icons.Outlined.Place,
         4.4446,
-        -75.2430
+        -75.2430,
+        categories = setOf(PlaceCategory.HISTORIA, PlaceCategory.CULTURA)
     ),
     IbaguePlace(
         "parque-musica",
@@ -78,6 +83,7 @@ val ibaguePlaces = listOf(
         Color(0xFFD8C6F0),
         Icons.Outlined.AccountBalance,
         4.4432,
-        -75.2442
+        -75.2442,
+        categories = setOf(PlaceCategory.CULTURA)
     )
 )

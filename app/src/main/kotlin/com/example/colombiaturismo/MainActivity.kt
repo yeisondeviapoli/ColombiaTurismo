@@ -287,13 +287,23 @@ fun AppDrawer(
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
-            Text(
-                "Colom-Via",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(24.dp)
-            )
+            Row(
+                modifier = Modifier.padding(24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_colomvia_logo),
+                    contentDescription = "Logo de Colom-Via",
+                    modifier = Modifier.size(40.dp)
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    "Colom-Via",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             NavigationDrawerItem(
                 label = { Text("Home") },
                 icon = { Icon(Icons.Outlined.Home, null) },
@@ -362,15 +372,11 @@ fun AppHeader(
                         Icon(Icons.Outlined.Menu, "Menú", tint = Color.White)
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(Coral),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(Icons.Outlined.Terrain, null, tint = Color.White)
-                }
+                Image(
+                    painter = painterResource(R.drawable.ic_colomvia_logo),
+                    contentDescription = "Logo de Colom-Via",
+                    modifier = Modifier.size(42.dp)
+                )
             }
 
             Spacer(Modifier.width(11.dp))
@@ -422,14 +428,14 @@ fun HomeScreen(
 ) {
     var selectedCity by remember { mutableStateOf("Bogotá") }
     var query by remember { mutableStateOf("") }
-    var category by remember { mutableStateOf("Todos") }
+    var category by remember { mutableStateOf(ALL_CATEGORIES) }
 
     Column(Modifier.fillMaxSize()) {
         AppHeader(title = "Colom-Via", subtitle = "¿A dónde quieres ir?", onMenuClick = onMenuClick)
         Spacer(Modifier.height(13.dp))
         SearchBar(query = query, onQueryChange = { query = it })
         Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 13.dp), horizontalArrangement = Arrangement.spacedBy(7.dp)) {
-            listOf("Todos", "Cultura", "Naturaleza", "Historia", "Playas").forEach { option ->
+            categoryFilters.forEach { option ->
                 FilterChip(text = option, selected = category == option, onClick = { category = option })
             }
         }

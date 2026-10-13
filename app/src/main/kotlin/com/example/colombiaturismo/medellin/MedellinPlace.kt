@@ -3,6 +3,7 @@ package com.example.colombiaturismo.medellin
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.colombiaturismo.PlaceCategory
 
 data class MedellinPlace(
     val id: String,
@@ -16,5 +17,6 @@ data class MedellinPlace(
     val placeholderColor: Color,
     val icon: ImageVector,
     val latitude: Double,   // Añadido para  Maps
-    val longitude: Double   // Añadido para  Maps
+    val longitude: Double,   // Añadido para  Maps
+    val categories: Set<PlaceCategory>
 )

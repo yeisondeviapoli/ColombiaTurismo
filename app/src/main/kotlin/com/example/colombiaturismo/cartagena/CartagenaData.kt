@@ -1,6 +1,7 @@
 package com.example.colombiaturismo.cartagena
 
 import androidx.annotation.DrawableRes
+import com.example.colombiaturismo.PlaceCategory
 import com.example.colombiaturismo.R
 
 // Definimos la clase incluyendo las coordenadas y el recurso de la imagen
@@ -14,7 +15,8 @@ data class CartagenaPlace(
     val price: String,
     val latitude: Double,   // Coordenada de latitud añadida
     val longitude: Double,  // Coordenada de longitud añadida
-    @DrawableRes val imageRes: Int
+    @DrawableRes val imageRes: Int,
+    val categories: Set<PlaceCategory>
 )
 
 // Lista con los 5 sitios principales de Cartagena con coordenadas exactas
@@ -29,7 +31,8 @@ val cartagenaPlaces = listOf(
         price = "Gratis",
         latitude = 10.4237,
         longitude = -75.5529,
-        imageRes = R.drawable.ciudad_amurallada
+        imageRes = R.drawable.ciudad_amurallada,
+        categories = setOf(PlaceCategory.HISTORIA, PlaceCategory.CULTURA)
     ),
     CartagenaPlace(
         id = "2",
@@ -41,7 +44,8 @@ val cartagenaPlaces = listOf(
         price = "$30.000 COP",
         latitude = 10.4208,
         longitude = -75.5451,
-        imageRes = R.drawable.san_felipe
+        imageRes = R.drawable.san_felipe,
+        categories = setOf(PlaceCategory.HISTORIA)
     ),
     CartagenaPlace(
         id = "3",
@@ -53,7 +57,8 @@ val cartagenaPlaces = listOf(
         price = "Varía según tour",
         latitude = 10.1853,
         longitude = -75.7483,
-        imageRes = R.drawable.islas_rosario
+        imageRes = R.drawable.islas_rosario,
+        categories = setOf(PlaceCategory.PLAYAS, PlaceCategory.NATURALEZA)
     ),
     CartagenaPlace(
         id = "4",
@@ -65,7 +70,8 @@ val cartagenaPlaces = listOf(
         price = "Gratis",
         latitude = 10.4042,
         longitude = -75.5564,
-        imageRes = R.drawable.bocagrande
+        imageRes = R.drawable.bocagrande,
+        categories = setOf(PlaceCategory.PLAYAS)
     ),
     CartagenaPlace(
         id = "5",
@@ -77,6 +83,7 @@ val cartagenaPlaces = listOf(
         price = "$20.000 COP",
         latitude = 10.4278,
         longitude = -75.5348,
-        imageRes = R.drawable.convento_popa
+        imageRes = R.drawable.convento_popa,
+        categories = setOf(PlaceCategory.HISTORIA, PlaceCategory.CULTURA)
     )
 )
