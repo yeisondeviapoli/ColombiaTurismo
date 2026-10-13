@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material3.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.colombiaturismo.ALL_CATEGORIES
+import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
 import com.example.colombiaturismo.matchesFilter
 
 private val MutedText = Color(0xFF7A8FA3)
@@ -32,6 +34,7 @@ private val DarkText = Color(0xFF1F3F5C)
 fun CartagenaListScreen(
     query: String = "",
     category: String = ALL_CATEGORIES,
+    favoritesViewModel: FavoritesViewModel, // <--- 1. Recibimos el ViewModel
     onPlaceClick: (CartagenaPlace) -> Unit = {}
 ) {
     val filteredPlaces = cartagenaPlaces.filter { place ->
@@ -44,9 +47,22 @@ fun CartagenaListScreen(
             .padding(end = 12.dp, top = 8.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
+        if (filteredPlaces.isEmpty()) {
+            item {
+                Text(
+                    text = "No hay lugares que coincidan",
+                    color = MutedText,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
         items(filteredPlaces) { place ->
-            CartagenaCard(place = place, onClick = { onPlaceClick(place) })
+            // 2. Pasamos el ViewModel a cada tarjeta
+            CartagenaCard(
+                place = place,
+                favoritesViewModel = favoritesViewModel,
+                onClick = { onPlaceClick(place) }
+            )
         }
     }
 }
@@ -54,8 +70,12 @@ fun CartagenaListScreen(
 @Composable
 fun CartagenaCard(
     place: CartagenaPlace,
+    favoritesViewModel: FavoritesViewModel, // <--- Recibimos el ViewModel aquí
     onClick: () -> Unit
 ) {
+    // 3. Verificamos si este lugar está marcado como favorito
+    val isFav = favoritesViewModel.isFavorite(place.name)
+
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(16.dp),
@@ -65,14 +85,12 @@ fun CartagenaCard(
             .clickable { onClick() }
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            // Contenedor de la imagen con el botón de guardar superpuesto
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp) // Ajustado ligeramente para lucir mejor con fotos
+                    .height(140.dp)
                     .clip(RoundedCornerShape(12.dp))
             ) {
-                // Imagen real cargada desde drawable
                 Image(
                     painter = painterResource(id = place.imageRes),
                     contentDescription = place.name,
@@ -80,19 +98,19 @@ fun CartagenaCard(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                // Botón de favoritos / marcador encima de la imagen
+                // 4. Botón de favoritos interactivo
                 IconButton(
-                    onClick = { /* Guardar */ },
+                    onClick = { favoritesViewModel.toggleFavorite(place.name) },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(8.dp)
                         .size(32.dp)
-                        .background(Color.White.copy(alpha = 0.8f), shape = RoundedCornerShape(20.dp))
+                        .background(Color.White.copy(alpha = 0.9f), shape = RoundedCornerShape(20.dp))
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.BookmarkBorder,
+                        imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
                         contentDescription = "Guardar",
-                        tint = DarkText,
+                        tint = if (isFav) Color(0xFFE53935) else DarkText,
                         modifier = Modifier.size(18.dp)
                     )
                 }

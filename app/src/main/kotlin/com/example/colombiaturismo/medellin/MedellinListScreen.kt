@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Star
@@ -24,13 +25,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.colombiaturismo.ALL_CATEGORIES
+import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
 import com.example.colombiaturismo.matchesFilter
 
 private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 
 @Composable
-fun MedellinListScreen(query: String = "", category: String = ALL_CATEGORIES, onPlaceClick: (MedellinPlace) -> Unit) {
+fun MedellinListScreen(
+    query: String = "",
+    category: String = ALL_CATEGORIES,
+    favoritesViewModel: FavoritesViewModel, // <--- 1. Recibimos el ViewModel
+    onPlaceClick: (MedellinPlace) -> Unit
+) {
     val filteredPlaces = medellinPlaces.filter { place ->
         val text = "${place.name} ${place.location} ${place.description}".lowercase()
         text.contains(query.trim().lowercase()) && place.categories.matchesFilter(category)
@@ -45,8 +52,15 @@ fun MedellinListScreen(query: String = "", category: String = ALL_CATEGORIES, on
                 Text("Innovación, arte y montaña", color = MutedText, fontSize = 12.sp)
             }
         }
-        if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
+        if (filteredPlaces.isEmpty()) {
+            item {
+                Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp))
+            }
+        }
         items(filteredPlaces, key = { it.id }) { place ->
+            // 2. Verificamos si este lugar de Medellín está en favoritos
+            val isFav = favoritesViewModel.isFavorite(place.name)
+
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(16.dp),
@@ -54,18 +68,34 @@ fun MedellinListScreen(query: String = "", category: String = ALL_CATEGORIES, on
                 modifier = Modifier.fillMaxWidth().clickable { onPlaceClick(place) }
             ) {
                 Column(Modifier.padding(12.dp)) {
-                    Box(Modifier.fillMaxWidth().height(125.dp).clip(RoundedCornerShape(12.dp)).background(place.placeholderColor)) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .height(125.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(place.placeholderColor)
+                    ) {
                         Image(
                             painter = painterResource(place.imageRes),
                             contentDescription = place.name,
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
+                        // 3. Botón interactivo de favoritos
                         IconButton(
-                            onClick = { },
-                            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(32.dp).background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(20.dp))
+                            onClick = { favoritesViewModel.toggleFavorite(place.name) },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .size(32.dp)
+                                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(20.dp))
                         ) {
-                            Icon(Icons.Outlined.BookmarkBorder, "Guardar", tint = DarkText, modifier = Modifier.size(18.dp))
+                            Icon(
+                                imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                contentDescription = "Guardar",
+                                tint = if (isFav) Color(0xFFE53935) else DarkText,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
                     Spacer(Modifier.height(8.dp))
