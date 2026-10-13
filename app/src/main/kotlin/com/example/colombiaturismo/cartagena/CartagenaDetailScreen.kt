@@ -1,8 +1,6 @@
 package com.example.colombiaturismo.cartagena
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
+import com.example.colombiaturismo.RatingStars
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -27,13 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
+import com.example.colombiaturismo.FavoritesViewModel
+import com.example.colombiaturismo.favoriteId
+import com.example.colombiaturismo.openDirections
+import com.example.colombiaturismo.sharePlace
 
 private val DarkNavy = Color(0xFF0D233A)
 private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 private val LightCardBg = Color(0xFFF7F9FA)
-private val StarYellow = Color(0xFFFFC107)
 
 @Composable
 fun CartagenaDetailScreen(
@@ -44,12 +44,12 @@ fun CartagenaDetailScreen(
     val context = LocalContext.current
 
     // 2. Verificamos si este lugar de Cartagena ya está en favoritos
-    val isFav = favoritesViewModel.isFavorite(place.name)
+    val isFav = favoritesViewModel.isFavorite(place.favoriteId)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -90,16 +90,7 @@ fun CartagenaDetailScreen(
                     }
 
                     IconButton(
-                        onClick = {
-                            val shareMessage = "¡Mira este lugar increíble en Cartagena: ${place.name}! Ubicado en ${place.location}."
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shareMessage)
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, null)
-                            context.startActivity(shareIntent)
-                        },
+                        onClick = { sharePlace(context, place.name, place.location, "Cartagena", place.latitude, place.longitude) },
                         modifier = Modifier
                             .size(40.dp)
                             .background(Color.Black.copy(alpha = 0.4f), CircleShape)
@@ -146,13 +137,13 @@ fun CartagenaDetailScreen(
                             modifier = Modifier
                                 .size(42.dp)
                                 .clickable {
-                                    favoritesViewModel.toggleFavorite(place.name)
+                                    favoritesViewModel.toggleFavorite(place.favoriteId)
                                 }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.Bookmark,
-                                    contentDescription = "Guardar",
+                                    imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                    contentDescription = "Guardar lugar",
                                     tint = if (isFav) Color(0xFFE53935) else MutedText,
                                     modifier = Modifier.size(22.dp)
                                 )
@@ -165,18 +156,10 @@ fun CartagenaDetailScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        repeat(5) {
-                            Icon(
-                                imageVector = Icons.Outlined.Star,
-                                contentDescription = null,
-                                tint = StarYellow,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                        }
+                        RatingStars(place.rating)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "${place.rating} (1,245 reseñas)",
+                            text = "${place.rating}",
                             color = MutedText,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
@@ -312,21 +295,7 @@ fun CartagenaDetailScreen(
                     Spacer(modifier = Modifier.height(28.dp))
 
                     Button(
-                        onClick = {
-                            val gmmIntentUri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
-                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri).apply {
-                                setPackage("com.google.android.apps.maps")
-                            }
-                            try {
-                                context.startActivity(mapIntent)
-                            } catch (e: ActivityNotFoundException) {
-                                val webIntent = Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse("https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}")
-                                )
-                                context.startActivity(webIntent)
-                            }
-                        },
+                        onClick = { openDirections(context, place.latitude, place.longitude) },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkNavy),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier

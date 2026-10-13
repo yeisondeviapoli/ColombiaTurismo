@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bookmark
@@ -30,7 +29,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -66,6 +64,7 @@ import com.example.colombiaturismo.ui.theme.ColomViaNavy
 import com.example.colombiaturismo.ui.theme.ColomViaSurface
 import com.example.colombiaturismo.ui.theme.ColomViaText
 import com.example.colombiaturismo.ui.theme.ColomViaTextMuted
+import com.example.colombiaturismo.ui.theme.ColomViaTopBar
 import java.text.DateFormat
 import java.util.Date
 import java.util.Locale
@@ -134,28 +133,7 @@ fun ProfileScreen(
             .background(Color.White)
     ) {
         Column(Modifier.fillMaxSize()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(ColomViaBlue)
-                    .padding(vertical = 18.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .align(Alignment.CenterStart)
-                        .padding(start = 4.dp)
-                ) {
-                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.cd_volver), tint = Color.White)
-                }
-                Text(
-                    stringResource(R.string.perfil_titulo),
-                    color = Color.White,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            ColomViaTopBar(title = stringResource(R.string.perfil_titulo), onBack = onBack)
 
             Column(
                 modifier = Modifier

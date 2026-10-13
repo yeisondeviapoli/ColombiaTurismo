@@ -13,8 +13,8 @@ android {
         applicationId = "com.example.colombiaturismo"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.2"
     }
 
     compileOptions {
@@ -39,6 +39,9 @@ dependencies {
     implementation("androidx.room:room-ktx:2.8.4")
     ksp("androidx.room:room-compiler:2.8.4")
     implementation("androidx.datastore:datastore-preferences:1.1.7")
+
+    // Mapa interactivo con OpenStreetMap (no requiere llave de API)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
     implementation(platform("androidx.compose:compose-bom:2025.08.00"))
     implementation("androidx.compose.ui:ui")

@@ -1,7 +1,6 @@
 package com.example.colombiaturismo.bogota
 
-import android.content.Intent
-import android.net.Uri
+import com.example.colombiaturismo.RatingStars
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,13 +25,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.colombiaturismo.FavoritesViewModel // <--- Asegúrate de importar tu ViewModel
+import com.example.colombiaturismo.FavoritesViewModel
+import com.example.colombiaturismo.favoriteId
+import com.example.colombiaturismo.openDirections
+import com.example.colombiaturismo.sharePlace
 
 private val DarkNavy = Color(0xFF0D233A)
 private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 private val LightCardBg = Color(0xFFF7F9FA)
-private val StarYellow = Color(0xFFFFC107)
 
 @Composable
 fun BogotaDetailScreen(
@@ -43,12 +44,12 @@ fun BogotaDetailScreen(
     val context = LocalContext.current
 
     // 2. Verificamos si este lugar ya es favorito
-    val isFav = favoritesViewModel.isFavorite(place.name)
+    val isFav = favoritesViewModel.isFavorite(place.favoriteId)
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DarkNavy)
+            .background(Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -89,7 +90,7 @@ fun BogotaDetailScreen(
                     }
 
                     IconButton(
-                        onClick = { },
+                        onClick = { sharePlace(context, place.name, place.location, "Bogotá", place.latitude, place.longitude) },
                         modifier = Modifier
                             .size(40.dp)
                             .background(Color.Black.copy(alpha = 0.4f), CircleShape)
@@ -137,13 +138,13 @@ fun BogotaDetailScreen(
                                 .size(42.dp)
                                 .clickable {
                                     // Alterna el estado de favorito al hacer clic
-                                    favoritesViewModel.toggleFavorite(place.name)
+                                    favoritesViewModel.toggleFavorite(place.favoriteId)
                                 }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.Bookmark,
-                                    contentDescription = "Guardar favorito",
+                                    imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                    contentDescription = "Guardar lugar",
                                     tint = if (isFav) Color(0xFFE53935) else MutedText,
                                     modifier = Modifier.size(22.dp)
                                 )
@@ -156,18 +157,10 @@ fun BogotaDetailScreen(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        repeat(5) {
-                            Icon(
-                                imageVector = Icons.Outlined.Star,
-                                contentDescription = null,
-                                tint = StarYellow,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(2.dp))
-                        }
+                        RatingStars(place.rating)
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "${place.rating} (1,245 reseñas)",
+                            text = "${place.rating}",
                             color = MutedText,
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
@@ -303,11 +296,7 @@ fun BogotaDetailScreen(
                     Spacer(modifier = Modifier.height(28.dp))
 
                     Button(
-                        onClick = {
-                            val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
-                            val intent = Intent(Intent.ACTION_VIEW, uri)
-                            context.startActivity(intent)
-                        },
+                        onClick = { openDirections(context, place.latitude, place.longitude) },
                         colors = ButtonDefaults.buttonColors(containerColor = DarkNavy),
                         shape = RoundedCornerShape(14.dp),
                         modifier = Modifier

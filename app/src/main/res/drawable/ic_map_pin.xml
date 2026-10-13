@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Marcador del mapa. El hueco central es transparente para poder teñirlo de un solo color. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="28dp"
+    android:height="35dp"
+    android:viewportWidth="32"
+    android:viewportHeight="40">
+    <path
+        android:fillColor="#FF111C33"
+        android:fillType="evenOdd"
+        android:pathData="M16,1C8.27,1 2,7.27 2,15C2,25.5 16,39 16,39C16,39 30,25.5 30,15C30,7.27 23.73,1 16,1ZM16,10a5,5 0,1 1,0 10a5,5 0,1 1,0 -10Z" />
+</vector>

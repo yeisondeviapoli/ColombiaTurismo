@@ -8,6 +8,8 @@ import com.example.colombiaturismo.data.AlmacenSesion
 import com.example.colombiaturismo.data.ColomViaDatabase
 import com.example.colombiaturismo.data.GestorFavoritos
 import com.example.colombiaturismo.data.ServicioAutenticacion
+import org.osmdroid.config.Configuration
+import java.io.File
 
 class ColomViaApp : Application() {
 
@@ -17,6 +19,22 @@ class ColomViaApp : Application() {
     override fun onCreate() {
         super.onCreate()
         contenedor = ContenedorApp(this)
+        configurarMapa()
+    }
+
+    /**
+     * OpenStreetMap exige que la app se identifique con un User-Agent propio: con el nombre
+     * de paquete genérico (com.example…) sus servidores devuelven mapas de "acceso bloqueado".
+     * Los mapas descargados se guardan en la caché interna.
+     */
+    private fun configurarMapa() {
+        val version = packageManager.getPackageInfo(packageName, 0).versionName
+        Configuration.getInstance().apply {
+            load(this@ColomViaApp, getSharedPreferences("osmdroid", MODE_PRIVATE))
+            userAgentValue = "ColomVia/$version (Android; proyecto academico Politecnico Grancolombiano)"
+            osmdroidBasePath = File(cacheDir, "osmdroid")
+            osmdroidTileCache = File(cacheDir, "osmdroid/tiles")
+        }
     }
 }
 

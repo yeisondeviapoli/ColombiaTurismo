@@ -1,7 +1,6 @@
 package com.example.colombiaturismo.medellin
 
-import android.content.Intent
-import android.net.Uri
+import com.example.colombiaturismo.RatingStars
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Navigation
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,7 +30,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
+import com.example.colombiaturismo.FavoritesViewModel
+import com.example.colombiaturismo.favoriteId
+import com.example.colombiaturismo.openDirections
+import com.example.colombiaturismo.sharePlace
 
 @Composable
 fun MedellinDetailScreen(
@@ -43,12 +44,12 @@ fun MedellinDetailScreen(
     val context = LocalContext.current
 
     // 2. Consultamos si el lugar de Medellín es favorito
-    val isFav = favoritesViewModel.isFavorite(place.name)
+    val isFav = favoritesViewModel.isFavorite(place.favoriteId)
 
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D233A))
+            .background(Color.White)
             .verticalScroll(rememberScrollState())
     ) {
         Box(Modifier.fillMaxWidth().height(280.dp)) {
@@ -69,7 +70,10 @@ fun MedellinDetailScreen(
                 IconButton(onClick = onBack, modifier = Modifier.background(Color.Black.copy(alpha = .4f), CircleShape)) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
-                IconButton(onClick = {}, modifier = Modifier.background(Color.Black.copy(alpha = .4f), CircleShape)) {
+                IconButton(
+                    onClick = { sharePlace(context, place.name, place.location, "Medellín", place.latitude, place.longitude) },
+                    modifier = Modifier.background(Color.Black.copy(alpha = .4f), CircleShape)
+                ) {
                     Icon(Icons.Outlined.Share, "Compartir", tint = Color.White)
                 }
             }
@@ -96,17 +100,17 @@ fun MedellinDetailScreen(
                     )
 
                     // 3. Botón de favoritos conectado al ViewModel
-                    IconButton(onClick = { favoritesViewModel.toggleFavorite(place.name) }) {
+                    IconButton(onClick = { favoritesViewModel.toggleFavorite(place.favoriteId) }) {
                         Icon(
                             imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                            contentDescription = "Favorito",
+                            contentDescription = "Guardar lugar",
                             tint = Color(0xFFE53935)
                         )
                     }
                 }
                 Text(place.location, color = Color(0xFF7A8FA3), fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
                 Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    repeat(5) { Icon(Icons.Outlined.Star, null, tint = Color(0xFFFFC107), modifier = Modifier.size(16.dp)) }
+                    RatingStars(place.rating)
                     Text("  ${place.rating}", color = Color(0xFF7A8FA3), fontSize = 13.sp)
                 }
                 Row(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -136,11 +140,7 @@ fun MedellinDetailScreen(
 
                 Spacer(Modifier.height(24.dp))
                 Button(
-                    onClick = {
-                        val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
-                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                        context.startActivity(intent)
-                    },
+                    onClick = { openDirections(context, place.latitude, place.longitude) },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0D233A)),
                     shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().height(52.dp)

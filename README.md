@@ -6,20 +6,24 @@ Aplicación Android en Kotlin + Jetpack Compose para el catálogo turístico de 
 
 - **Inicio de sesión y registro**: creación de cuenta con nombre, correo y contraseña, validación de los campos y recuperación de contraseña.
 - **Sesión persistente**: el usuario permanece conectado al cerrar y volver a abrir la app hasta que cierre sesión.
-- **Catálogo por ciudades**: Bogotá, Cartagena, Ibagué y Medellín, seleccionables desde la columna lateral de la pantalla de inicio.
-- **Buscador y filtros** por categoría: Todos, Cultura, Naturaleza, Historia y Playas.
-- **Detalle de cada lugar**: imagen, descripción, ubicación, horario, precio y calificación.
-- **Ubicación en el mapa**: cada lugar abre su ubicación en Google Maps a partir de sus coordenadas.
-- **Perfil**: consulta de los datos del usuario, edición del nombre y cambio de contraseña.
-- **Navegación**: menú lateral (hamburguesa) con Home y Cerrar sesión, y barra inferior con Explorar, Favoritos y Perfil.
+- **Catálogo por ciudades**: Bogotá, Medellín, Cartagena, Ibagué y Pereira, seleccionables desde la columna lateral de la pantalla de inicio, cada una con su apodo y una descripción.
+- **Buscador y filtros** por categoría (Todos, Cultura, Naturaleza, Historia y Playas). La búsqueda encuentra lugares de las cinco ciudades.
+- **Detalle de cada lugar**: imagen, descripción, ubicación, horario, precio y calificación con estrellas.
+- **Mapa interactivo** (OpenStreetMap): marcadores de todos los lugares, búsqueda, filtro por categoría, ubicación actual del usuario (con permiso) y tarjeta con "Ver detalle".
+- **Cómo llegar**: abre las indicaciones en Google Maps (o en el navegador si no está instalado).
+- **Compartir** un lugar o la app con otras aplicaciones.
+- **Guardados**: cada usuario guarda sus lugares favoritos en su perfil; se conservan al cerrar la app y al cerrar sesión.
+- **Perfil**: datos del usuario, cantidad de lugares guardados, edición del nombre y cambio de contraseña.
+- **Navegación**: menú lateral con Home, Mapa, Guardados, Perfil y Cerrar sesión, y barra inferior con Explorar, Guardados y Perfil.
 
 ## Tecnologías
 
 - Kotlin 2.2.20 y Jetpack Compose (Material 3)
 - Android Gradle Plugin 8.13.0
-- Room para guardar los usuarios de forma local
+- Room para guardar los usuarios y sus lugares guardados de forma local
 - DataStore para la sesión activa
-- Contraseñas almacenadas con hash y sal
+- Contraseñas almacenadas con hash y sal (PBKDF2)
+- osmdroid para el mapa de OpenStreetMap (no requiere llave de API)
 - JUnit 4 para las pruebas unitarias
 
 ## Requisitos
@@ -33,7 +37,11 @@ Aplicación Android en Kotlin + Jetpack Compose para el catálogo turístico de 
 ```
 app/src/main/kotlin/com/example/colombiaturismo/
 ├── MainActivity.kt      Pantalla de inicio, navegación, menú lateral y barra inferior
-├── ColomViaApp.kt       Inicialización de la base de datos y la sesión
+├── ColomViaApp.kt       Inicialización de la base de datos, la sesión y el mapa
+├── Cities.kt            Información de las cinco ciudades
+├── SavedPlaces.kt       Catálogo de todos los lugares e ids únicos para Guardados
+├── FavoritesScreen.kt   Pantalla de lugares guardados
+├── map/                 Mapa interactivo
 ├── auth/                Login, registro y recuperación de contraseña
 ├── profile/             Perfil del usuario y cierre de sesión
 ├── data/                Base de datos (Room), sesión (DataStore) y autenticación
@@ -41,10 +49,11 @@ app/src/main/kotlin/com/example/colombiaturismo/
 ├── cartagena/           Datos, lista y detalle de Cartagena
 ├── ibague/              Datos, lista y detalle de Ibagué
 ├── medellin/            Datos, lista y detalle de Medellín
+├── pereira/             Datos, lista y detalle de Pereira
 └── ui/theme/            Colores de la app
 ```
 
-Las imágenes de los lugares están en `app/src/main/res/drawable/`.
+Las imágenes de los lugares están en `app/src/main/res/drawable/`. Los créditos de las fotos de Wikimedia Commons y del mapa están en [CREDITOS_IMAGENES.md](CREDITOS_IMAGENES.md).
 
 ## Cómo ejecutar el proyecto
 
