@@ -143,6 +143,13 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
                         screen = "home"
                         scope.launch { drawerState.close() }
                     },
+                    onFavoritesClick = {
+                        scope.launch { drawerState.close() }
+                    },
+                    onProfileClick = {
+                        screen = "perfil"
+                        scope.launch { drawerState.close() }
+                    },
                     onLogoutClick = {
                         scope.launch { drawerState.close() }
                         showLogoutDialog = true
@@ -153,7 +160,10 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
             Column(Modifier.fillMaxSize()) {
                 Box(Modifier.weight(1f)) {
                     when (screen) {
-                        "perfil" -> ProfileRoute(onLogoutClick = { showLogoutDialog = true })
+                        "perfil" -> ProfileRoute(
+                            onBack = { screen = "home" },
+                            onLogoutClick = { showLogoutDialog = true }
+                        )
                         "ibague_detail" -> selectedIbaguePlace?.let { place ->
                             IbagueDetailScreen(place = place, onBack = { screen = "home" })
                         }
@@ -259,8 +269,15 @@ fun AppBottomBar(currentScreen: String, onExploreClick: () -> Unit, onProfileCli
 fun AppDrawer(
     drawerState: DrawerState,
     onHomeClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onProfileClick: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
+    val itemColors = NavigationDrawerItemDefaults.colors(
+        unselectedContainerColor = Color.Transparent,
+        unselectedIconColor = Color.White,
+        unselectedTextColor = Color.White
+    )
     ModalDrawerSheet(
         drawerState = drawerState,
         drawerContainerColor = Navy
@@ -282,11 +299,23 @@ fun AppDrawer(
                 icon = { Icon(Icons.Outlined.Home, null) },
                 selected = false,
                 onClick = onHomeClick,
-                colors = NavigationDrawerItemDefaults.colors(
-                    unselectedContainerColor = Color.Transparent,
-                    unselectedIconColor = Color.White,
-                    unselectedTextColor = Color.White
-                ),
+                colors = itemColors,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+            NavigationDrawerItem(
+                label = { Text("Favoritos") },
+                icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
+                selected = false,
+                onClick = onFavoritesClick,
+                colors = itemColors,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+            NavigationDrawerItem(
+                label = { Text("Perfil") },
+                icon = { Icon(Icons.Outlined.Person, null) },
+                selected = false,
+                onClick = onProfileClick,
+                colors = itemColors,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
         }
