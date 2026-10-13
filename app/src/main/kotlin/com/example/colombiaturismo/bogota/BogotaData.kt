@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.MonetizationOn
 import androidx.compose.material.icons.outlined.Museum
 import androidx.compose.material.icons.outlined.Place
 import androidx.compose.ui.graphics.Color
+import com.example.colombiaturismo.PlaceCategory
 import com.example.colombiaturismo.R
 
 val bogotaPlaces = listOf(
@@ -22,7 +23,8 @@ val bogotaPlaces = listOf(
         placeholderColor = Color(0xFFAED8C0),
         icon = Icons.Outlined.Landscape,
         latitude = 4.6058,
-        longitude = -74.0558
+        longitude = -74.0558,
+        categories = setOf(PlaceCategory.NATURALEZA, PlaceCategory.HISTORIA)
     ),
     BogotaPlace(
         id = "2",
@@ -36,7 +38,8 @@ val bogotaPlaces = listOf(
         placeholderColor = Color(0xFFF4C77B),
         icon = Icons.Outlined.MonetizationOn,
         latitude = 4.6015,
-        longitude = -74.0721
+        longitude = -74.0721,
+        categories = setOf(PlaceCategory.CULTURA, PlaceCategory.HISTORIA)
     ),
     BogotaPlace(
         id = "3",
@@ -50,7 +53,8 @@ val bogotaPlaces = listOf(
         placeholderColor = Color(0xFFF3A68D),
         icon = Icons.Outlined.Place,
         latitude = 4.5962,
-        longitude = -74.0735
+        longitude = -74.0735,
+        categories = setOf(PlaceCategory.HISTORIA, PlaceCategory.CULTURA)
     ),
     BogotaPlace(
         id = "4",
@@ -64,7 +68,8 @@ val bogotaPlaces = listOf(
         placeholderColor = Color(0xFFC5DEA2),
         icon = Icons.Outlined.Museum,
         latitude = 4.5960,
-        longitude = -74.0738
+        longitude = -74.0738,
+        categories = setOf(PlaceCategory.CULTURA)
     ),
     BogotaPlace(
         id = "5",
@@ -78,6 +83,7 @@ val bogotaPlaces = listOf(
         placeholderColor = Color(0xFFB9D4EC),
         icon = Icons.Outlined.AccountBalance,
         latitude = 4.5981,
-        longitude = -74.0760
+        longitude = -74.0760,
+        categories = setOf(PlaceCategory.HISTORIA)
     )
 )

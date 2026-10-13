@@ -23,21 +23,17 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.ALL_CATEGORIES
+import com.example.colombiaturismo.matchesFilter
 
 private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 
 @Composable
-fun IbagueListScreen(query: String = "", category: String = "Todos", onPlaceClick: (IbaguePlace) -> Unit) {
+fun IbagueListScreen(query: String = "", category: String = ALL_CATEGORIES, onPlaceClick: (IbaguePlace) -> Unit) {
     val filteredPlaces = ibaguePlaces.filter { place ->
         val text = "${place.name} ${place.location} ${place.description}".lowercase()
-        text.contains(query.trim().lowercase()) && (category == "Todos" ||
-            when (category) {
-                "Cultura" -> text.contains("músic") || text.contains("cultural") || text.contains("patrimonio")
-                "Historia" -> text.contains("históric") || text.contains("patrimonio")
-                "Naturaleza" -> text.contains("natural") || text.contains("montaña") || text.contains("flora")
-                else -> false
-            })
+        text.contains(query.trim().lowercase()) && place.categories.matchesFilter(category)
     }
     LazyColumn(
         modifier = Modifier.fillMaxSize().padding(end = 12.dp, top = 8.dp, bottom = 8.dp),

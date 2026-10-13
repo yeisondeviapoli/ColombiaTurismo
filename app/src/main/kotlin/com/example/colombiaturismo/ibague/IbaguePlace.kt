@@ -3,6 +3,7 @@ package com.example.colombiaturismo.ibague
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.colombiaturismo.PlaceCategory
 
 data class IbaguePlace(
     val id: String,
@@ -16,5 +17,6 @@ data class IbaguePlace(
     val placeholderColor: Color,
     val icon: ImageVector,
     val latitude: Double,   // Añadido para el Maps
-    val longitude: Double   // Añadido para el Maps
+    val longitude: Double,   // Añadido para el Maps
+    val categories: Set<PlaceCategory>
 )

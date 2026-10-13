@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.Museum
 import androidx.compose.material.icons.outlined.Park
 import androidx.compose.material.icons.outlined.Train
 import androidx.compose.ui.graphics.Color
+import com.example.colombiaturismo.PlaceCategory
 import com.example.colombiaturismo.R
 
 val medellinPlaces = listOf(
@@ -22,7 +23,8 @@ val medellinPlaces = listOf(
         Color(0xFFF2C27B),
         Icons.Outlined.AccountBalance,
         6.2372,
-        -75.5783
+        -75.5783,
+        categories = setOf(PlaceCategory.HISTORIA, PlaceCategory.CULTURA)
     ),
     MedellinPlace(
         "metrocable",
@@ -36,7 +38,8 @@ val medellinPlaces = listOf(
         Color(0xFFAED8C0),
         Icons.Outlined.Train,
         6.2994,
-        -75.5566
+        -75.5566,
+        categories = setOf(PlaceCategory.NATURALEZA)
     ),
     MedellinPlace(
         "comuna-13",
@@ -50,7 +53,8 @@ val medellinPlaces = listOf(
         Color(0xFFF3A68D),
         Icons.Outlined.Park,
         6.2443,
-        -75.6186
+        -75.6186,
+        categories = setOf(PlaceCategory.CULTURA, PlaceCategory.HISTORIA)
     ),
     MedellinPlace(
         "plaza-botero",
@@ -64,7 +68,8 @@ val medellinPlaces = listOf(
         Color(0xFFB9D4EC),
         Icons.Outlined.Museum,
         6.2519,
-        -75.5683
+        -75.5683,
+        categories = setOf(PlaceCategory.CULTURA)
     ),
     MedellinPlace(
         "feria-flores",
@@ -78,6 +83,7 @@ val medellinPlaces = listOf(
         Color(0xFFEAB8D6),
         Icons.Outlined.Park,
         6.2447,
-        -75.5768
+        -75.5768,
+        categories = setOf(PlaceCategory.CULTURA)
     )
 )

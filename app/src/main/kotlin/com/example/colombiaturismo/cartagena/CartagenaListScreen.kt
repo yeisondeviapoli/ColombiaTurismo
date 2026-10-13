@@ -22,6 +22,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.ALL_CATEGORIES
+import com.example.colombiaturismo.matchesFilter
 
 private val MutedText = Color(0xFF7A8FA3)
 private val DarkText = Color(0xFF1F3F5C)
@@ -29,19 +31,12 @@ private val DarkText = Color(0xFF1F3F5C)
 @Composable
 fun CartagenaListScreen(
     query: String = "",
-    category: String = "Todos",
+    category: String = ALL_CATEGORIES,
     onPlaceClick: (CartagenaPlace) -> Unit = {}
 ) {
     val filteredPlaces = cartagenaPlaces.filter { place ->
         val text = "${place.name} ${place.location} ${place.description}".lowercase()
-        text.contains(query.trim().lowercase()) && (category == "Todos" ||
-            when (category) {
-                "Playas" -> text.contains("playa") || text.contains("mar") || text.contains("isla") || text.contains("cost")
-                "Historia" -> text.contains("histori") || text.contains("colonial") || text.contains("castillo") || text.contains("convento")
-                "Naturaleza" -> text.contains("natural") || text.contains("coral") || text.contains("isla")
-                "Cultura" -> text.contains("cultural") || text.contains("ciudad")
-                else -> false
-            })
+        text.contains(query.trim().lowercase()) && place.categories.matchesFilter(category)
     }
     LazyColumn(
         modifier = Modifier
