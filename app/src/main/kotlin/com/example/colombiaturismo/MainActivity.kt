@@ -118,10 +118,12 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
     var selectedBogotaPlace by remember { mutableStateOf<BogotaPlace?>(null) }
     var selectedIbaguePlace by remember { mutableStateOf<IbaguePlace?>(null) }
     var selectedMedellinPlace by remember { mutableStateOf<MedellinPlace?>(null) }
-    var savedCount by remember { mutableIntStateOf(1) }
     var showLogoutDialog by rememberSaveable { mutableStateOf(false) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    // Instanciamos el ViewModel global de favoritos limpio y funcional
+    val favoritesViewModel: FavoritesViewModel = viewModel()
 
     BackHandler(enabled = screen != "home") {
         screen = "home"
@@ -144,6 +146,7 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
                         scope.launch { drawerState.close() }
                     },
                     onFavoritesClick = {
+                        screen = "favorites"
                         scope.launch { drawerState.close() }
                     },
                     onProfileClick = {
@@ -164,17 +167,54 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
                             onBack = { screen = "home" },
                             onLogoutClick = { showLogoutDialog = true }
                         )
+                        "favorites" -> FavoritesScreen(
+                            favoritesViewModel = favoritesViewModel,
+                            onPlaceClick = { placeName ->
+                                val bogotaMatch = com.example.colombiaturismo.bogota.bogotaPlaces.find { it.name == placeName }
+                                if (bogotaMatch != null) {
+                                    selectedBogotaPlace = bogotaMatch
+                                    screen = "bogota_detail"
+                                } else {
+                                    val cartagenaMatch = com.example.colombiaturismo.cartagena.cartagenaPlaces.find { it.name == placeName }
+                                    if (cartagenaMatch != null) {
+                                        selectedCartagenaPlace = cartagenaMatch
+                                        screen = "cartagena_detail"
+                                    } else {
+                                        val ibagueMatch = com.example.colombiaturismo.ibague.ibaguePlaces.find { it.name == placeName }
+                                        if (ibagueMatch != null) {
+                                            selectedIbaguePlace = ibagueMatch
+                                            screen = "ibague_detail"
+                                        } else {
+                                            val medellinMatch = com.example.colombiaturismo.medellin.medellinPlaces.find { it.name == placeName }
+                                            if (medellinMatch != null) {
+                                                selectedMedellinPlace = medellinMatch
+                                                screen = "medellin_detail"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        )
                         "ibague_detail" -> selectedIbaguePlace?.let { place ->
-                            IbagueDetailScreen(place = place, onBack = { screen = "home" })
+                            IbagueDetailScreen(
+                                place = place,
+                                favoritesViewModel = favoritesViewModel,
+                                onBack = { screen = "home" }
+                            )
                         }
                         "medellin_detail" -> selectedMedellinPlace?.let { place ->
-                            MedellinDetailScreen(place = place, onBack = { screen = "home" })
+                            MedellinDetailScreen(
+                                place = place,
+                                favoritesViewModel = favoritesViewModel,
+                                onBack = { screen = "home" }
+                            )
                         }
                         "cartagena_detail" -> {
                             val place = selectedCartagenaPlace
                             if (place != null) {
                                 CartagenaDetailScreen(
                                     place = place,
+                                    favoritesViewModel = favoritesViewModel,
                                     onBack = { screen = "home" }
                                 )
                             }
@@ -184,11 +224,13 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
                             if (place != null) {
                                 BogotaDetailScreen(
                                     place = place,
+                                    favoritesViewModel = favoritesViewModel,
                                     onBack = { screen = "home" }
                                 )
                             }
                         }
                         else -> HomeScreen(
+                            favoritesViewModel = favoritesViewModel,
                             onNavigateToIbagueDetail = { place ->
                                 selectedIbaguePlace = place
                                 screen = "ibague_detail"
@@ -214,6 +256,7 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
                 AppBottomBar(
                     currentScreen = screen,
                     onExploreClick = { screen = "home" },
+                    onFavoritesClick = { screen = "favorites" },
                     onProfileClick = { screen = "perfil" }
                 )
             }
@@ -232,7 +275,12 @@ fun ColombiaTurismoApp(onLogout: () -> Unit) {
 }
 
 @Composable
-fun AppBottomBar(currentScreen: String, onExploreClick: () -> Unit, onProfileClick: () -> Unit) {
+fun AppBottomBar(
+    currentScreen: String,
+    onExploreClick: () -> Unit,
+    onFavoritesClick: () -> Unit,
+    onProfileClick: () -> Unit
+) {
     val itemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = Navy,
         selectedTextColor = Navy,
@@ -242,15 +290,15 @@ fun AppBottomBar(currentScreen: String, onExploreClick: () -> Unit, onProfileCli
     )
     NavigationBar(containerColor = Color.White) {
         NavigationBarItem(
-            selected = currentScreen != "perfil",
+            selected = currentScreen == "home",
             onClick = onExploreClick,
             icon = { Icon(Icons.Outlined.Explore, null) },
             colors = itemColors,
             label = { Text("Explorar") }
         )
         NavigationBarItem(
-            selected = false,
-            onClick = { },
+            selected = currentScreen == "favorites",
+            onClick = onFavoritesClick,
             icon = { Icon(Icons.Outlined.FavoriteBorder, null) },
             colors = itemColors,
             label = { Text("Favoritos") }
@@ -420,6 +468,7 @@ fun SearchBar(query: String, onQueryChange: (String) -> Unit) {
 
 @Composable
 fun HomeScreen(
+    favoritesViewModel: FavoritesViewModel,
     onNavigateToIbagueDetail: (IbaguePlace) -> Unit,
     onNavigateToMedellinDetail: (MedellinPlace) -> Unit,
     onNavigateToDetail: (CartagenaPlace) -> Unit,
@@ -452,10 +501,10 @@ fun HomeScreen(
                     .fillMaxHeight()
             ) {
                 when (selectedCity) {
-                    "Cartagena" -> CartagenaListScreen(query, category, onNavigateToDetail)
-                    "Ibagué" -> IbagueListScreen(query, category, onNavigateToIbagueDetail)
-                    "Medellín" -> MedellinListScreen(query, category, onNavigateToMedellinDetail)
-                    else -> BogotaListScreen(query, category, onNavigateToBogotaDetail)
+                    "Cartagena" -> CartagenaListScreen(query, category, favoritesViewModel, onNavigateToDetail)
+                    "Ibagué" -> IbagueListScreen(query, category, favoritesViewModel, onNavigateToIbagueDetail)
+                    "Medellín" -> MedellinListScreen(query, category, favoritesViewModel, onNavigateToMedellinDetail)
+                    else -> BogotaListScreen(query, category, favoritesViewModel, onNavigateToBogotaDetail)
                 }
             }
         }
@@ -517,17 +566,16 @@ fun CityMiniCard(
                 .background(city.imageColor),
             contentAlignment = Alignment.Center
         ) {
-            // Cartagena
             if (city.name == "Cartagena") {
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.ciudad_amurallada),
+                Image(
+                    painter = painterResource(id = R.drawable.ciudad_amurallada),
                     contentDescription = city.name,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             } else if (city.name == "Bogotá") {
-                androidx.compose.foundation.Image(
-                    painter = androidx.compose.ui.res.painterResource(id = R.drawable.bogota_ciudad),
+                Image(
+                    painter = painterResource(id = R.drawable.bogota_ciudad),
                     contentDescription = city.name,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -543,7 +591,7 @@ fun CityMiniCard(
                 Image(
                     painter = painterResource(id = R.drawable.pueblitopaisa),
                     contentDescription = city.name,
-                    contentScale = androidx.compose.ui.layout.ContentScale.Crop,
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
                 )
             } else {
@@ -561,7 +609,6 @@ fun CityMiniCard(
     }
 }
 
-// CORRECCIÓN 2: HomeFeatured ahora acepta datos dinámicos y scroll vertical
 @Composable
 fun HomeFeatured(
     cityName: String,
@@ -576,7 +623,7 @@ fun HomeFeatured(
                 Color.White,
                 RoundedCornerShape(topStart = 18.dp)
             )
-            .verticalScroll(rememberScrollState()) // Añadido scroll para evitar recortes
+            .verticalScroll(rememberScrollState())
             .padding(14.dp)
     ) {
         Row(verticalAlignment = Alignment.Bottom) {

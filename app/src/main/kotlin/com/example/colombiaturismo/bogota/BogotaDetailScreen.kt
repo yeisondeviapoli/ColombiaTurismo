@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -11,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -24,6 +26,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.FavoritesViewModel // <--- Asegúrate de importar tu ViewModel
 
 private val DarkNavy = Color(0xFF0D233A)
 private val DarkText = Color(0xFF1F3F5C)
@@ -34,9 +37,13 @@ private val StarYellow = Color(0xFFFFC107)
 @Composable
 fun BogotaDetailScreen(
     place: BogotaPlace,
+    favoritesViewModel: FavoritesViewModel, // <--- 1. Recibimos el ViewModel aquí
     onBack: () -> Unit
 ) {
-    val context = LocalContext.current // <--- Contexto para abrir Google Maps
+    val context = LocalContext.current
+
+    // 2. Verificamos si este lugar ya es favorito
+    val isFav = favoritesViewModel.isFavorite(place.name)
 
     Box(
         modifier = Modifier
@@ -122,16 +129,22 @@ fun BogotaDetailScreen(
                             modifier = Modifier.weight(1f)
                         )
 
+                        // 3. Botón de favorito interactivo
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFFFEbee),
-                            modifier = Modifier.size(42.dp)
+                            color = if (isFav) Color(0xFFFFEBEE) else LightCardBg,
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clickable {
+                                    // Alterna el estado de favorito al hacer clic
+                                    favoritesViewModel.toggleFavorite(place.name)
+                                }
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
-                                    imageVector = Icons.Outlined.Bookmark,
-                                    contentDescription = "Guardar",
-                                    tint = Color(0xFFE53935),
+                                    imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.Bookmark,
+                                    contentDescription = "Guardar favorito",
+                                    tint = if (isFav) Color(0xFFE53935) else MutedText,
                                     modifier = Modifier.size(22.dp)
                                 )
                             }
@@ -291,7 +304,6 @@ fun BogotaDetailScreen(
 
                     Button(
                         onClick = {
-                            // Abrir Google Maps con la latitud, longitud y nombre del lugar de Bogotá
                             val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
                             val intent = Intent(Intent.ACTION_VIEW, uri)
                             context.startActivity(intent)

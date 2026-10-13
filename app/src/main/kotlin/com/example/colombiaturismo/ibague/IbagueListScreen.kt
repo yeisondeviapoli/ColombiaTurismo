@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Star
@@ -24,13 +25,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.colombiaturismo.ALL_CATEGORIES
+import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
 import com.example.colombiaturismo.matchesFilter
 
 private val DarkText = Color(0xFF1F3F5C)
 private val MutedText = Color(0xFF7A8FA3)
 
 @Composable
-fun IbagueListScreen(query: String = "", category: String = ALL_CATEGORIES, onPlaceClick: (IbaguePlace) -> Unit) {
+fun IbagueListScreen(
+    query: String = "",
+    category: String = ALL_CATEGORIES,
+    favoritesViewModel: FavoritesViewModel, // <--- 1. Recibimos el ViewModel
+    onPlaceClick: (IbaguePlace) -> Unit
+) {
     val filteredPlaces = ibaguePlaces.filter { place ->
         val text = "${place.name} ${place.location} ${place.description}".lowercase()
         text.contains(query.trim().lowercase()) && place.categories.matchesFilter(category)
@@ -45,8 +52,15 @@ fun IbagueListScreen(query: String = "", category: String = ALL_CATEGORIES, onPl
                 Text("La ciudad musical de Colombia", color = MutedText, fontSize = 12.sp)
             }
         }
-        if (filteredPlaces.isEmpty()) item { Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp)) }
+        if (filteredPlaces.isEmpty()) {
+            item {
+                Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp))
+            }
+        }
         items(filteredPlaces, key = { it.id }) { place ->
+            // 2. Verificamos si este lugar está guardado
+            val isFav = favoritesViewModel.isFavorite(place.name)
+
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 shape = RoundedCornerShape(16.dp),
@@ -68,11 +82,21 @@ fun IbagueListScreen(query: String = "", category: String = ALL_CATEGORIES, onPl
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
                         )
+                        // 3. Botón de favoritos interactivo
                         IconButton(
-                            onClick = { },
-                            modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(32.dp).background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(20.dp))
+                            onClick = { favoritesViewModel.toggleFavorite(place.name) },
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp)
+                                .size(32.dp)
+                                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(20.dp))
                         ) {
-                            Icon(Icons.Outlined.BookmarkBorder, "Guardar", tint = DarkText, modifier = Modifier.size(18.dp))
+                            Icon(
+                                imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                                contentDescription = "Guardar",
+                                tint = if (isFav) Color(0xFFE53935) else DarkText,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     }
                     Spacer(Modifier.height(8.dp))

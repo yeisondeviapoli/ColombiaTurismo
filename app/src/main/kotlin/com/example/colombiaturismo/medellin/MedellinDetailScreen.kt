@@ -5,29 +5,25 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Bookmark
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.outlined.BookmarkBorder
 import androidx.compose.material.icons.outlined.ConfirmationNumber
-import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Navigation
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -36,16 +32,40 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
 
 @Composable
-fun MedellinDetailScreen(place: MedellinPlace, onBack: () -> Unit) {
-    val isSaved = remember { mutableStateOf(false) }
-    val context = LocalContext.current // <--- Contexto para abrir Google Maps
+fun MedellinDetailScreen(
+    place: MedellinPlace,
+    favoritesViewModel: FavoritesViewModel, // <--- 1. Recibimos el ViewModel
+    onBack: () -> Unit
+) {
+    val context = LocalContext.current
 
-    Column(Modifier.fillMaxSize().background(Color(0xFF0D233A)).verticalScroll(rememberScrollState())) {
+    // 2. Consultamos si el lugar de Medellín es favorito
+    val isFav = favoritesViewModel.isFavorite(place.name)
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0D233A))
+            .verticalScroll(rememberScrollState())
+    ) {
         Box(Modifier.fillMaxWidth().height(280.dp)) {
-            Image(painterResource(place.imageRes), place.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-            Row(Modifier.fillMaxWidth().statusBarsPadding().padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(place.imageRes),
+                contentDescription = place.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 IconButton(onClick = onBack, modifier = Modifier.background(Color.Black.copy(alpha = .4f), CircleShape)) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = Color.White)
                 }
@@ -54,12 +74,34 @@ fun MedellinDetailScreen(place: MedellinPlace, onBack: () -> Unit) {
                 }
             }
         }
-        Surface(Modifier.fillMaxWidth().offset(y = (-22).dp), shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp), color = Color.White) {
+        Surface(
+            Modifier
+                .fillMaxWidth()
+                .offset(y = (-22).dp),
+            shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
+            color = Color.White
+        ) {
             Column(Modifier.padding(24.dp)) {
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text(place.name, color = Color(0xFF1F3F5C), fontSize = 24.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                    IconButton(onClick = { isSaved.value = !isSaved.value }) {
-                        Icon(if (isSaved.value) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder, "Favorito", tint = Color(0xFFE53935))
+                Row(
+                    Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        place.name,
+                        color = Color(0xFF1F3F5C),
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    // 3. Botón de favoritos conectado al ViewModel
+                    IconButton(onClick = { favoritesViewModel.toggleFavorite(place.name) }) {
+                        Icon(
+                            imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
+                            contentDescription = "Favorito",
+                            tint = Color(0xFFE53935)
+                        )
                     }
                 }
                 Text(place.location, color = Color(0xFF7A8FA3), fontSize = 13.sp, modifier = Modifier.padding(top = 4.dp))
@@ -95,7 +137,6 @@ fun MedellinDetailScreen(place: MedellinPlace, onBack: () -> Unit) {
                 Spacer(Modifier.height(24.dp))
                 Button(
                     onClick = {
-                        // Acción para abrir Google Maps con las coordenadas del lugar
                         val uri = Uri.parse("geo:${place.latitude},${place.longitude}?q=${Uri.encode(place.name)}")
                         val intent = Intent(Intent.ACTION_VIEW, uri)
                         context.startActivity(intent)
