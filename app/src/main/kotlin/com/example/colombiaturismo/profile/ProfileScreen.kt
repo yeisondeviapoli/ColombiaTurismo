@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.Bookmark
@@ -29,6 +30,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -70,6 +72,7 @@ import java.util.Locale
 
 @Composable
 fun ProfileRoute(
+    onBack: () -> Unit,
     onLogoutClick: () -> Unit,
     viewModel: ProfileViewModel = viewModel(factory = ProfileViewModel.Factory)
 ) {
@@ -89,6 +92,7 @@ fun ProfileRoute(
         snackbarHostState = snackbarHostState,
         onEditNameClick = viewModel::onEditNameClick,
         onChangePasswordClick = viewModel::onChangePasswordClick,
+        onBack = onBack,
         onLogoutClick = onLogoutClick
     )
 
@@ -112,13 +116,14 @@ fun ProfileRoute(
     }
 }
 
-/** Pestaña "Perfil" de la barra inferior. Sigue el estilo de la pantalla Guardados del mockup. */
+/** Pantalla "Perfil", accesible desde la barra inferior y el menú lateral. Sigue el estilo de la pantalla Guardados del mockup. */
 @Composable
 fun ProfileScreen(
     uiState: ProfileUiState,
     snackbarHostState: SnackbarHostState,
     onEditNameClick: () -> Unit,
     onChangePasswordClick: () -> Unit,
+    onBack: () -> Unit,
     onLogoutClick: () -> Unit
 ) {
     val usuario = uiState.usuario
@@ -136,6 +141,14 @@ fun ProfileScreen(
                     .padding(vertical = 18.dp),
                 contentAlignment = Alignment.Center
             ) {
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 4.dp)
+                ) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.cd_volver), tint = Color.White)
+                }
                 Text(
                     stringResource(R.string.perfil_titulo),
                     color = Color.White,
@@ -428,6 +441,7 @@ private fun ProfileScreenPreview() {
         snackbarHostState = remember { SnackbarHostState() },
         onEditNameClick = {},
         onChangePasswordClick = {},
+        onBack = {},
         onLogoutClick = {}
     )
 }
