@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Colombia Turismo</string>
+    <string name="app_name">Colom-Via</string>
     <string name="brand_name">Colom-Via</string>
     <string name="cd_logo">Logo de Colom-Via</string>
     <string name="cd_volver">Volver</string>
@@ -64,4 +64,47 @@
     <!-- Cerrar sesión -->
     <string name="cerrar_sesion">Cerrar sesión</string>
     <string name="cerrar_sesion_mensaje">¿Seguro que quieres cerrar sesión? Tus lugares guardados seguirán en tu perfil.</string>
+
+    <!-- Navegación -->
+    <string name="nav_explorar">Explorar</string>
+    <string name="nav_guardados">Guardados</string>
+    <string name="nav_perfil">Perfil</string>
+
+    <!-- Pantalla 6: Guardados -->
+    <string name="guardados_titulo">Guardados</string>
+    <string name="guardados_vacio_titulo">Aún no tienes lugares guardados</string>
+    <string name="guardados_vacio_texto">Explora las ciudades y guarda tus lugares favoritos para verlos aquí.</string>
+    <string name="guardados_explorar">Explorar lugares</string>
+    <plurals name="guardados_cantidad">
+        <item quantity="one">%d lugar guardado</item>
+        <item quantity="other">%d lugares guardados</item>
+    </plurals>
+    <string name="cd_guardar_lugar">Guardar lugar</string>
+    <string name="cd_quitar_guardado">Quitar de guardados</string>
+    <string name="cd_ver_detalle">Ver detalle</string>
+
+    <!-- Compartir y mapas -->
+    <string name="cd_compartir">Compartir</string>
+    <string name="compartir_lugar">Mira %1$s en %2$s (%3$s), lo encontré en Colom-Via:\n%4$s</string>
+    <string name="compartir_app">Descubre los mejores lugares turísticos de Bogotá, Medellín, Cartagena, Pereira e Ibagué con Colom-Via.</string>
+    <string name="error_sin_app_mapas">No hay una aplicación para abrir el mapa</string>
+    <string name="error_sin_app_compartir">No hay una aplicación para compartir</string>
+    <!-- Pantalla 4: Mapa interactivo -->
+    <string name="mapa_titulo">Mapa</string>
+    <string name="mapa_buscar">Buscar lugares, ciudades…</string>
+    <string name="mapa_filtrar">Filtrar por categoría</string>
+    <string name="mapa_mi_ubicacion">Mi ubicación</string>
+    <string name="mapa_ver_detalle">Ver detalle</string>
+    <string name="mapa_sin_resultados">No hay lugares que coincidan</string>
+    <string name="mapa_permiso_ubicacion">Activa el permiso de ubicación para ver dónde estás</string>
+    <string name="mapa_buscando_ubicacion">Buscando tu ubicación…</string>
+    <string name="mapa_atribucion">© colaboradores de OpenStreetMap</string>
+    <string name="cd_abrir_mapa">Abrir mapa</string>
+    <string name="cd_limpiar_busqueda">Limpiar búsqueda</string>
+
+    <!-- Búsqueda en todas las ciudades -->
+    <plurals name="busqueda_resultados">
+        <item quantity="one">%d lugar en todas las ciudades</item>
+        <item quantity="other">%d lugares en todas las ciudades</item>
+    </plurals>
 </resources>

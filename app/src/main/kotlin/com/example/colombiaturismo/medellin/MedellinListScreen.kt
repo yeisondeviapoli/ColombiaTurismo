@@ -1,5 +1,7 @@
 package com.example.colombiaturismo.medellin
 
+import com.example.colombiaturismo.cityInfo
+import com.example.colombiaturismo.CityHeader
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,7 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.colombiaturismo.ALL_CATEGORIES
-import com.example.colombiaturismo.FavoritesViewModel // <--- Importamos el ViewModel
+import com.example.colombiaturismo.FavoritesViewModel
+import com.example.colombiaturismo.favoriteId
 import com.example.colombiaturismo.matchesFilter
 
 private val DarkText = Color(0xFF1F3F5C)
@@ -46,12 +49,7 @@ fun MedellinListScreen(
         modifier = Modifier.fillMaxSize().padding(end = 12.dp, top = 8.dp, bottom = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        item {
-            Column(Modifier.padding(start = 4.dp, bottom = 2.dp)) {
-                Text("Medellín", color = DarkText, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                Text("Innovación, arte y montaña", color = MutedText, fontSize = 12.sp)
-            }
-        }
+        item { CityHeader(cityInfo("Medellín")) }
         if (filteredPlaces.isEmpty()) {
             item {
                 Text("No hay lugares que coincidan", color = MutedText, modifier = Modifier.padding(16.dp))
@@ -59,7 +57,7 @@ fun MedellinListScreen(
         }
         items(filteredPlaces, key = { it.id }) { place ->
             // 2. Verificamos si este lugar de Medellín está en favoritos
-            val isFav = favoritesViewModel.isFavorite(place.name)
+            val isFav = favoritesViewModel.isFavorite(place.favoriteId)
 
             Card(
                 colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -83,7 +81,7 @@ fun MedellinListScreen(
                         )
                         // 3. Botón interactivo de favoritos
                         IconButton(
-                            onClick = { favoritesViewModel.toggleFavorite(place.name) },
+                            onClick = { favoritesViewModel.toggleFavorite(place.favoriteId) },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(8.dp)
@@ -92,7 +90,7 @@ fun MedellinListScreen(
                         ) {
                             Icon(
                                 imageVector = if (isFav) Icons.Filled.Bookmark else Icons.Outlined.BookmarkBorder,
-                                contentDescription = "Guardar",
+                                contentDescription = "Guardar lugar",
                                 tint = if (isFav) Color(0xFFE53935) else DarkText,
                                 modifier = Modifier.size(18.dp)
                             )
